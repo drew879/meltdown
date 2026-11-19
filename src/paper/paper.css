@@ -1,0 +1,426 @@
+/* The play screen in the cut-paper look. The yard, snowman and sun are
+   generated paper pieces; the tags, banner, keys and thermometer are built
+   here so they can hold live text and stretch to any answer. */
+@import '@fontsource-variable/nunito/wght.css';
+
+.pp {
+  --charcoal: #3a3531;
+  --cream: #f4ecd8;
+  --kraft: #c8a674;
+  --kraft-dark: #a9875a;
+  --coral: #e2705a;
+  --sun: #f4c93e;
+  --hit: #9dc15b;
+  --miss: #b8b4ab;
+  --grass: #7f8531;
+  --sky: #73c0da;
+  /* paper fibre: a speckle laid over every flat colour */
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n' x='0' y='0' width='100%25' height='100%25'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.25  0 0 0 0 0.2  0 0 0 0 0.15  0 0 0 0.9 -0.32'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  --lift: 0 1px 0 rgba(255, 255, 255, 0.35) inset, 0 2px 0 rgba(60, 45, 20, 0.22), 0 5px 7px rgba(45, 55, 15, 0.32);
+
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  overflow: hidden;
+  background: var(--grass);
+  color: var(--charcoal);
+  font-family: 'Nunito Variable', ui-rounded, system-ui, sans-serif;
+  font-weight: 900;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- the yard ---- */
+.pp-yard {
+  position: absolute;
+  z-index: 0;
+  max-width: none;
+  /* its lower edge melts into the page's grass colour */
+  -webkit-mask-image: linear-gradient(#000 88%, transparent);
+  mask-image: linear-gradient(#000 88%, transparent);
+  pointer-events: none;
+}
+
+/* ---- name tags ---- */
+.pp-tags {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) calc(env(safe-area-inset-right, 0px) + 14px) 0
+    calc(env(safe-area-inset-left, 0px) + 14px);
+}
+.pp-tag {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  max-width: 46%;
+  padding: 5px 12px 4px 26px;
+  border-radius: 7px 9px 8px 6px / 8px 6px 9px 7px;
+  background: var(--cream) var(--grain);
+  box-shadow: var(--lift);
+  font-size: 17px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transform: rotate(-1.5deg);
+}
+.pp-tag:last-child {
+  transform: rotate(1.2deg);
+}
+.pp-tag::before {
+  /* the brass pin */
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #f3dc8a, #b98d2c 70%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.pp-tag.turn {
+  background-color: var(--sun);
+}
+.pp-tag .pp-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pp-tag small {
+  position: absolute;
+  left: 26px;
+  bottom: -15px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--charcoal);
+  color: var(--cream);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+/* ---- the scene ---- */
+.pp-scene {
+  position: relative;
+  z-index: 1;
+  min-height: 0;
+}
+.pp-snowman,
+.pp-sun {
+  position: absolute;
+  max-width: none;
+  /* real paper casts a soft shadow on what is behind it */
+  filter: drop-shadow(0 5px 4px rgba(40, 50, 15, 0.38));
+  will-change: transform;
+}
+.pp-snowman {
+  transform-origin: 50% 100%;
+}
+.pp-sun {
+  transform-origin: 50% 50%;
+  filter: drop-shadow(0 4px 4px rgba(30, 70, 90, 0.35));
+  transition: width 0.5s steps(4), left 0.5s steps(4), top 0.5s steps(4);
+}
+
+/* the danger meter: one notch per miss allowed */
+.pp-thermo {
+  position: absolute;
+  --w: 30px;
+  width: var(--w);
+  border-radius: calc(var(--w) / 2) calc(var(--w) / 2) 0 0;
+  background: var(--cream) var(--grain);
+  box-shadow: var(--lift);
+}
+.pp-thermo::after {
+  /* the bulb */
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--w) * -1.15);
+  width: calc(var(--w) * 1.7);
+  height: calc(var(--w) * 1.7);
+  margin-left: calc(var(--w) * -0.85);
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--coral) 0 56%, transparent 57%), var(--cream) var(--grain);
+  background-color: var(--cream);
+  box-shadow: 0 2px 0 rgba(60, 45, 20, 0.22), 0 5px 7px rgba(45, 55, 15, 0.32);
+}
+.pp-thermo .pp-mercury {
+  position: absolute;
+  z-index: 1;
+  left: 32%;
+  right: 32%;
+  bottom: calc(var(--w) * -0.6);
+  border-radius: 99px 99px 0 0;
+  background: var(--coral) var(--grain);
+  transition: height 0.45s steps(5);
+}
+.pp-thermo .pp-notch {
+  position: absolute;
+  z-index: 2;
+  right: 3px;
+  width: 30%;
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 2px;
+  background: var(--charcoal);
+  opacity: 0.75;
+}
+
+/* ---- the answer, pegged to a line ---- */
+.pp-line {
+  position: relative;
+  z-index: 2;
+  padding: 0 calc(env(safe-area-inset-right, 0px) + 12px) 0 calc(env(safe-area-inset-left, 0px) + 12px);
+}
+.pp-string {
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  top: 8px;
+  height: 5px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(115deg, #c9a468 0 4px, #94713f 4px 7px);
+  box-shadow: 0 2px 2px rgba(40, 50, 15, 0.35);
+}
+.pp-peg {
+  position: absolute;
+  z-index: 3;
+  top: -4px;
+  width: 13px;
+  height: 36px;
+  border-radius: 3px 3px 5px 5px;
+  background: var(--grain), linear-gradient(90deg, #d9b47c 0 40%, #8a6a3d 40% 56%, #cfa86e 56%);
+  box-shadow: 0 2px 3px rgba(40, 40, 10, 0.45);
+}
+.pp-peg.l {
+  left: max(22%, 104px); /* clear of the category tag */
+  transform: rotate(-4deg);
+}
+.pp-peg.r {
+  right: 22%;
+  transform: rotate(5deg);
+}
+.pp-banner-wrap {
+  position: relative;
+  margin-top: 18px;
+  filter: drop-shadow(0 4px 4px rgba(40, 50, 15, 0.36));
+}
+.pp-banner {
+  min-height: 62px;
+  padding: 16px 12px 13px;
+  background: var(--cream) var(--grain);
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  /* torn edges: the outline is set in script */
+}
+.pp-category {
+  position: absolute;
+  z-index: 3;
+  left: -6px;
+  top: -13px;
+  padding: 3px 10px 2px 20px;
+  border-radius: 4px;
+  clip-path: polygon(11px 0, 100% 0, 100% 100%, 11px 100%, 0 50%);
+  background: var(--kraft) var(--grain);
+  font-size: 13px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  transform: rotate(-5deg);
+}
+.pp-category::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: var(--charcoal);
+  opacity: 0.6;
+}
+.pp-answer {
+  --slot: 30px;
+  display: grid;
+  justify-items: center;
+  gap: calc(var(--slot) * 0.2);
+}
+.pp-row {
+  display: flex;
+  justify-content: center;
+  gap: 0 calc(var(--slot) * 0.6);
+}
+.pp-word {
+  display: flex;
+}
+.pp-slot {
+  position: relative;
+  width: var(--slot);
+  height: calc(var(--slot) * 1.28);
+  display: grid;
+  place-items: start center;
+  font-size: calc(var(--slot) * 1.06);
+  line-height: 1.02;
+  /* letters read as cut paper: a lit top edge and a small shadow underneath */
+  text-shadow: 0 -0.5px 0 rgba(255, 255, 255, 0.25), 0 1.5px 1px rgba(70, 50, 20, 0.35);
+}
+.pp-slot.letter::after {
+  /* the dash */
+  content: '';
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  bottom: 0;
+  height: max(2.5px, calc(var(--slot) * 0.1));
+  border-radius: 2px;
+  background: var(--charcoal);
+}
+.pp-slot.missed {
+  color: var(--coral);
+}
+.pp-slot.pop {
+  animation: pp-pop 0.34s steps(4) both;
+}
+@keyframes pp-pop {
+  0% {
+    transform: translateY(-40%) scale(0.5) rotate(-12deg);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(6%) scale(1.15) rotate(3deg);
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* ---- the keyboard, in its own tray ---- */
+.pp-tray {
+  position: relative;
+  z-index: 2;
+  width: calc(100% - 16px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  max-width: 620px;
+  justify-self: center;
+  margin: 22px 0 calc(env(safe-area-inset-bottom, 0px) + 10px);
+  padding: 11px 7px 13px;
+  border-radius: 20px 24px 22px 19px / 22px 19px 24px 20px;
+  background: var(--kraft) var(--grain);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 3px 0 var(--kraft-dark), 0 8px 10px rgba(40, 45, 10, 0.4);
+  display: grid;
+  gap: 8px;
+}
+.pp-krow {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+.pp-key {
+  appearance: none;
+  flex: 0 1 calc((100% - 45px) / 10);
+  min-width: 0;
+  height: clamp(40px, 5.6vh, 54px);
+  padding: 1px 0 0;
+  border: 0;
+  border-radius: 7px 8px 6px 9px / 8px 6px 9px 7px;
+  background: var(--cream) var(--grain);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 2px 0 rgba(70, 50, 20, 0.3), 0 4px 4px rgba(60, 40, 10, 0.3);
+  color: var(--charcoal);
+  font: inherit;
+  font-size: clamp(17px, 5.2vw, 23px);
+  line-height: 1;
+}
+.pp-key:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(70, 50, 20, 0.3);
+}
+.pp-key:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+/* right is green and raised; wrong is grey, faded and pressed flat */
+.pp-key.hit {
+  background-color: var(--hit);
+}
+.pp-key.miss {
+  background-color: var(--miss);
+  color: rgba(58, 53, 49, 0.42);
+  box-shadow: 0 1px 0 rgba(70, 50, 20, 0.25) inset;
+  transform: translateY(2px);
+}
+
+/* the round is over */
+.pp-again {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 2px;
+  transform: translateX(-50%) rotate(-2deg);
+  white-space: nowrap;
+  padding: 9px 22px 7px;
+  border: 0;
+  border-radius: 12px 14px 11px 15px;
+  background: var(--sun) var(--grain);
+  box-shadow: var(--lift);
+  color: var(--charcoal);
+  font: inherit;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.pp-again[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pp-slot.pop {
+    animation: none;
+  }
+  .pp-sun,
+  .pp-thermo .pp-mercury {
+    transition: none;
+  }
+}
+
+/* Stop-motion life: held poses that step, never glide. */
+.pp-snowman {
+  animation: pp-boil 1.3s steps(2, jump-none) infinite;
+}
+.pp-sun {
+  animation: pp-pulse 1.9s steps(3, jump-none) infinite;
+}
+@keyframes pp-boil {
+  0%,
+  100% {
+    transform: rotate(-0.5deg);
+  }
+  50% {
+    transform: rotate(0.6deg);
+  }
+}
+@keyframes pp-pulse {
+  0%,
+  100% {
+    transform: scale(1) rotate(-1.5deg);
+  }
+  50% {
+    transform: scale(1.035) rotate(1.5deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pp-snowman,
+  .pp-sun {
+    animation: none;
+  }
+}
