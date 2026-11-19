@@ -1,0 +1,270 @@
+/* The gameplay screen: scene on top, puzzle in the middle, keyboard at the bottom. */
+.play {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto auto;
+  overflow: hidden;
+  background: var(--sand);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* ---- the stage ---- */
+.stage {
+  position: relative;
+  min-height: 0;
+}
+.stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.scorebar {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) calc(env(safe-area-inset-right, 0px) + 10px) 0
+    calc(env(safe-area-inset-left, 0px) + 10px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+}
+.player {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  max-width: 100%;
+  justify-self: start;
+  padding: 4px 5px 4px 11px;
+  border: var(--line) solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 0 var(--drop) 0 var(--ink);
+  background: var(--cream);
+}
+.player.right {
+  flex-direction: row-reverse;
+  justify-self: end;
+  padding: 4px 11px 4px 5px;
+  text-align: right;
+}
+.player.turn {
+  background: var(--sun);
+}
+.player .who {
+  min-width: 0;
+  display: grid;
+}
+.player .role {
+  font: 900 10px/1.1 var(--text);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+.player .pname {
+  font: 900 16px/1.15 var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.player .score {
+  flex: none;
+  min-width: 34px;
+  height: 34px;
+  padding: 2px 6px 0;
+  display: grid;
+  place-items: center;
+  border: 2.5px solid var(--ink);
+  border-radius: 12px;
+  background: var(--snow);
+  font: 400 21px/1 var(--display);
+}
+.round {
+  justify-self: center;
+  margin-top: 3px;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+}
+
+/* what Melvin says */
+.quip {
+  position: absolute;
+  z-index: 1;
+  max-width: 44%;
+  padding: 7px 12px 6px;
+  border: var(--line) solid var(--ink);
+  border-radius: 16px;
+  background: var(--snow);
+  box-shadow: 0 var(--drop) 0 var(--ink);
+  font: 900 16px/1.2 var(--text);
+  transform: translate(-100%, -100%);
+}
+.quip::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  bottom: -9px;
+  width: 14px;
+  height: 14px;
+  background: var(--snow);
+  border-right: var(--line) solid var(--ink);
+  border-bottom: var(--line) solid var(--ink);
+  transform: skewX(28deg) rotate(45deg);
+}
+
+/* ---- the puzzle ---- */
+.puzzle {
+  position: relative;
+  padding: 2px 12px 12px;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+.puzzle .meta {
+  display: flex;
+  gap: 7px;
+  margin-top: -13px; /* the chips straddle the edge of the scene */
+  z-index: 1;
+}
+.tiles {
+  --tile: 38px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 9px calc(var(--tile) * 0.42);
+}
+.word {
+  display: flex;
+  gap: 4px;
+}
+.tile {
+  position: relative;
+  width: var(--tile);
+  height: calc(var(--tile) * 1.2);
+  display: grid;
+  place-items: center;
+  padding-top: 2px;
+  border: var(--line) solid var(--ink);
+  border-radius: calc(var(--tile) * 0.27);
+  box-shadow: 0 var(--drop) 0 var(--ink);
+  background: var(--snow);
+  font: 900 calc(var(--tile) * 0.7) / 1 var(--text);
+}
+/* an unguessed letter is a block of ice */
+.tile.ice {
+  background: var(--ice);
+}
+.tile.ice::before {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0 0;
+  border-radius: 0 0 calc(var(--tile) * 0.19) calc(var(--tile) * 0.19);
+  background: var(--ice-deep);
+  opacity: 0.55;
+}
+.tile.ice::after {
+  content: '';
+  position: absolute;
+  left: 14%;
+  top: 12%;
+  width: 38%;
+  height: 13%;
+  border-radius: 99px;
+  background: var(--snow);
+  transform: rotate(-20deg);
+}
+
+/* ---- the keyboard ---- */
+.keyboard {
+  width: 100%;
+  max-width: 640px;
+  justify-self: center;
+  padding: 2px calc(env(safe-area-inset-right, 0px) + 5px) calc(env(safe-area-inset-bottom, 0px) + 12px)
+    calc(env(safe-area-inset-left, 0px) + 5px);
+  display: grid;
+  gap: 9px;
+}
+.krow {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+.key {
+  appearance: none;
+  position: relative;
+  flex: 0 1 calc((100% - 45px) / 10);
+  min-width: 0;
+  height: clamp(42px, 6vh, 56px);
+  padding: 2px 0 0;
+  border: 2.5px solid var(--ink);
+  border-radius: 11px;
+  box-shadow: 0 var(--drop) 0 var(--ink);
+  background: var(--cream);
+  color: var(--ink);
+  font: 900 21px/1 var(--text);
+  transition: transform 80ms ease-out, box-shadow 80ms ease-out;
+}
+.key:active {
+  transform: translateY(3px) scale(1.06, 0.92);
+  box-shadow: 0 1px 0 var(--ink);
+}
+.key.hit {
+  background: var(--sea);
+  color: var(--snow);
+}
+.key.miss {
+  background: var(--sand-shade);
+  color: rgba(35, 25, 66, 0.5);
+  box-shadow: 0 1px 0 var(--ink);
+  transform: translateY(3px);
+}
+/* right and wrong are marked by a symbol as well as a colour */
+.key .mark {
+  position: absolute;
+  top: -8px;
+  right: -5px;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--snow);
+}
+.key.miss .mark {
+  background: var(--coral);
+}
+.key .mark svg {
+  width: 10px;
+  height: 10px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.key.miss .mark svg {
+  stroke: var(--snow);
+}
+
+@media (max-width: 359px) {
+  .tiles {
+    --tile: 30px;
+  }
+  .key {
+    font-size: 18px;
+  }
+  .player .pname {
+    font-size: 14px;
+  }
+}

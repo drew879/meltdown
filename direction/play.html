@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#35b9f1" />
+    <title>Meltdown: gameplay style frame</title>
+    <script type="module" src="./play.ts"></script>
+  </head>
+  <body>
+    <main class="play" id="play">
+      <div class="stage" id="stage">
+        <canvas id="scene" role="img" aria-label="Melvin the snowman on a beach."></canvas>
+        <header class="scorebar" id="scorebar">
+          <div class="player turn">
+            <div class="who"><span class="role">Guessing</span><span class="pname">Sam</span></div>
+            <span class="score" aria-label="2 points">2</span>
+          </div>
+          <div class="round">
+            <span class="chip">Round 4</span>
+          </div>
+          <div class="player right">
+            <div class="who"><span class="role">Set it</span><span class="pname">Dad</span></div>
+            <span class="score" aria-label="1 point">1</span>
+          </div>
+        </header>
+        <div class="quip" id="quip">Uh-oh. No T!</div>
+      </div>
+      <section class="puzzle" aria-label="Puzzle">
+        <div class="meta">
+          <span class="chip coral">Animal</span>
+          <span class="chip">Normal</span>
+        </div>
+        <div class="tiles" id="tiles"></div>
+      </section>
+      <div class="keyboard" id="keyboard" aria-label="Letters"></div>
+    </main>
+  </body>
+</html>

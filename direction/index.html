@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#35b9f1" />
+    <title>Meltdown: Phase 1 direction</title>
+    <script type="module" src="./board.ts"></script>
+  </head>
+  <body class="board">
+    <header class="hero">
+      <canvas id="hero" role="img" aria-label="Melvin the snowman on a beach, with Ray the sun above him."></canvas>
+      <div class="hero-title">
+        <span class="chip sea">Phase 1 · Direction</span>
+        <h1 class="inked">Meltdown</h1>
+      </div>
+    </header>
+
+    <main>
+      <section class="sticker card">
+        <h2>The pitch</h2>
+        <p><b>Melvin</b> is a very dapper snowman who booked the wrong holiday. He packed for the slopes and landed on the hottest beach in the world.</p>
+        <p><b>Ray</b> is the sun, and Ray thinks this is the funniest thing he has ever seen.</p>
+        <p>Every wrong letter turns up the heat. Guess the word before Melvin is a puddle.</p>
+      </section>
+
+      <section class="sticker card">
+        <h2>Turn up the heat</h2>
+        <p>Drag the slider. Everything you see is drawn live by the game's own code, so this is how it will look and move on your phone.</p>
+        <div class="live"><canvas id="live" role="img" aria-label="Live scene. Use the slider to melt Melvin."></canvas></div>
+        <label class="slider">
+          <span>Cool</span>
+          <input id="heat" type="range" min="0" max="875" value="0" aria-label="Heat" />
+          <span>Hot</span>
+        </label>
+      </section>
+
+      <section class="sticker card">
+        <h2>Melvin</h2>
+        <p>Bowler hat, striped scarf, twig arms, coal eyes and buttons, carrot nose. He starts out a ham and ends up a mess.</p>
+        <div class="sheet" id="melvin-sheet"></div>
+      </section>
+
+      <section class="sticker card">
+        <h2>Ray</h2>
+        <p>Smug to start. The hotter it gets, the bigger he grins.</p>
+        <div class="sheet three" id="ray-sheet"></div>
+      </section>
+
+      <section class="sticker card">
+        <h2>A round in play</h2>
+        <p>This is the real layout at phone size: scene on top, puzzle in the middle, keyboard under your thumbs.</p>
+        <div class="phone"><iframe id="frame" src="./play.html" title="Gameplay style frame"></iframe></div>
+        <p class="center"><a class="btn" href="./play.html">Open full screen</a></p>
+        <p class="links">Other moments:
+          <a href="./play.html?misses=0">fresh</a> ·
+          <a href="./play.html?misses=4">4 of 6 missed</a> ·
+          <a href="./play.html?limit=8&misses=7">Easy, 7 of 8</a> ·
+          <a href="./play.html?limit=4&misses=3">Hard, 3 of 4</a>
+        </p>
+      </section>
+
+      <section class="sticker card">
+        <h2>Palette</h2>
+        <p>One small set of colours for the art and the buttons alike.</p>
+        <div class="swatches" id="swatches"></div>
+      </section>
+
+      <section class="sticker card">
+        <h2>Type</h2>
+        <p class="spec-display">Bagel Fat One</p>
+        <p>For titles, scores and big moments. It is soft and round, like something made of snow.</p>
+        <p class="spec-text">Nunito, for everything you read</p>
+        <p>Clear, friendly letters. The keys and the puzzle tiles both use it, so the letter you tap looks the same as the letter that appears.</p>
+        <div class="alphabet" id="alphabet"></div>
+        <p class="small">Both are open-licence fonts (OFL) served from the game itself.</p>
+      </section>
+
+      <section class="sticker card">
+        <h2>How it is drawn</h2>
+        <p>Melvin and Ray are drawn by code on a canvas, sixty times a second, from a handful of numbers such as "how melted" and "how worried". That means any difficulty can stop at any point in the melt, every guess can get its own reaction, the lines stay sharp on any screen, and all of the art weighs less than one photo. The buttons, tiles and keyboard are ordinary web elements styled to match, so they work with VoiceOver.</p>
+        <h2>How it will sound</h2>
+        <p>Each piece of music starts as MIDI written by a script, with a rough preview so we can settle the tune in chat. Then it is rebuilt in Ableton Live with better instruments and exported as layers. The game stacks those layers as the heat rises, so the music builds without ever skipping a beat. Sound effects are made in code.</p>
+      </section>
+    </main>
+  </body>
+</html>

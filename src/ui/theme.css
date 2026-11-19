@@ -1,0 +1,117 @@
+/* Fonts are self-hosted (both OFL). Nothing loads from a third party. */
+@import '@fontsource/bagel-fat-one/latin-400.css';
+@import '@fontsource/bagel-fat-one/latin-ext-400.css';
+@import '@fontsource-variable/nunito/wght.css';
+
+:root {
+  --ink: #231942;
+  --snow: #ffffff;
+  --cream: #fff5dc;
+  --sand: #ffe191;
+  --sand-shade: #f7c765;
+  --sand-dark: #e6ab4b;
+  --sky: #35b9f1;
+  --ice: #c9ecff;
+  --ice-deep: #8fd3f7;
+  --sea: #17c6b9;
+  --sea-deep: #0d9ea6;
+  --coral: #ff5468;
+  --coral-deep: #d63653;
+  --sun: #ffd83d;
+  --ray: #ffa22e;
+
+  --display: 'Bagel Fat One', ui-rounded, system-ui, sans-serif;
+  --text: 'Nunito Variable', ui-rounded, system-ui, sans-serif;
+
+  /* the ink outline and the hard "sticker" shadow every control shares */
+  --line: 3px;
+  --drop: 4px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--text);
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--sand);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* A cream card with an ink outline and a hard shadow. */
+.sticker {
+  background: var(--cream);
+  border: var(--line) solid var(--ink);
+  border-radius: 18px;
+  box-shadow: 0 var(--drop) 0 var(--ink);
+}
+
+/* White display lettering with an ink outline, for titles and big moments. */
+.inked {
+  font-family: var(--display);
+  font-weight: 400;
+  color: var(--snow);
+  -webkit-text-stroke: 0.17em var(--ink);
+  paint-order: stroke fill;
+  text-shadow: 0 0.09em 0 var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 11px 2px;
+  border: 2.5px solid var(--ink);
+  border-radius: 999px;
+  box-shadow: 0 3px 0 var(--ink);
+  background: var(--cream);
+  font: 400 14px/1.3 var(--display);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.chip.coral {
+  background: var(--coral);
+  color: var(--snow);
+}
+.chip.sea {
+  background: var(--sea);
+  color: var(--snow);
+}
+
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 22px 9px;
+  border: var(--line) solid var(--ink);
+  border-radius: 16px;
+  box-shadow: 0 5px 0 var(--ink);
+  background: var(--sun);
+  color: var(--ink);
+  font: 400 20px/1.1 var(--display);
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 90ms ease-out, box-shadow 90ms ease-out;
+}
+.btn:active {
+  transform: translateY(4px) scale(1.03, 0.94);
+  box-shadow: 0 1px 0 var(--ink);
+}
+.btn:focus-visible {
+  outline: 3px solid var(--snow);
+  outline-offset: 3px;
+}
