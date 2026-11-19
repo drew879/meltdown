@@ -8,3 +8,6 @@ test-results/
 playwright-report/
 # the original copy of the brief; BRIEF.md is the tracked one
 meltdown-brief.md
+
+# full-size generated concept art stays local; the smaller JPEG copies are tracked
+art/concepts/**/originals/
