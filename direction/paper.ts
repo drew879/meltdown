@@ -36,7 +36,7 @@ const sun = $<HTMLImageElement>('sun');
 const snowman = $<HTMLImageElement>('snowman');
 const thermo = $('thermo');
 const mercury = $('mercury');
-const banner = $('banner');
+const sign = $('sign');
 const answerEl = $('answer');
 const tray = $('tray');
 const again = $<HTMLButtonElement>('again');
@@ -72,44 +72,68 @@ for (let i = 1; i <= LIMIT; i++) {
   thermo.append(n);
 }
 
-// ---- the answer on its banner ----
-/**
- * Pick the biggest letter size at which the answer fits the banner, wrapping
- * between words. Short answers get big letters; a 60-character title drops to
- * a smaller size over up to five rows.
- */
-function fitAnswer(width: number): { slot: number; rows: string[][] } {
-  const words = ANSWER.split(' ');
-  for (const slot of [38, 34, 30, 27, 24, 22, 20, 18, 16, 15, 14, 13, 12]) {
-    const perRow = Math.floor(width / slot);
-    if (words.some((w) => [...w].length > perRow)) continue;
-    const rows: string[][] = [[]];
-    let used = 0;
-    for (const w of words) {
-      const len = [...w].length;
-      const need = used === 0 ? len : used + 0.6 + len;
-      if (need > perRow && used > 0) {
-        rows.push([w]);
-        used = len;
-      } else {
-        rows.at(-1)!.push(w);
-        used = need;
-      }
+// ---- the answer on its garden sign ----
+/** Boards are drawn from these, in turn. Cream letters need the darker two. */
+const BOARDS: Piece[] = ['plank-1', 'plank-3'];
+
+/** A board never gets thinner than this, however small its letters. */
+const MIN_BOARD = 36;
+const boardHeight = (slot: number) => Math.max(slot * 2.05, MIN_BOARD);
+
+/** Break the answer into rows of at most `perRow` letter-widths, or null if a word cannot fit. */
+function wrap(words: string[], perRow: number): string[][] | null {
+  if (words.some((w) => [...w].length > perRow)) return null;
+  const rows: string[][] = [[]];
+  let used = 0;
+  for (const w of words) {
+    const len = [...w].length;
+    const need = used === 0 ? len : used + 0.6 + len;
+    if (need > perRow && used > 0) {
+      rows.push([w]);
+      used = len;
+    } else {
+      rows.at(-1)!.push(w);
+      used = need;
     }
-    if (rows.length <= (slot >= 34 ? 2 : slot >= 24 ? 3 : slot >= 17 ? 4 : 5)) return { slot, rows };
   }
-  return { slot: 12, rows: [words] };
+  return rows;
+}
+
+/**
+ * Lay the answer out on the sign, one board per row. Fewer boards are
+ * preferred as long as the letters stay big: a short answer sits on one board,
+ * and a 60-character title steps down to smaller letters on up to five.
+ */
+function fitAnswer(signWidth: number): { slot: number; rows: string[][] } {
+  const words = ANSWER.split(' ');
+  const SIZES = [38, 34, 30, 27, 24, 22, 20, 18, 16, 15, 14, 13, 12, 11, 10];
+  const k = Math.min(1, signWidth / 420);
+  // the smallest letter size worth having on one, two, three and four boards
+  const worth = [30, 28, 22, 16].map((px) => px * k);
+  let fallback: { slot: number; rows: string[][] } | null = null;
+  for (let maxRows = 1; maxRows <= 5; maxRows++) {
+    for (const slot of SIZES) {
+      // a board's ragged, nailed ends are not written on
+      const perRow = Math.floor((signWidth - 2 * 0.54 * boardHeight(slot)) / slot);
+      const rows = wrap(words, perRow);
+      if (!rows || rows.length > maxRows) continue;
+      if (maxRows === 5 || slot >= worth[maxRows - 1]!) return { slot, rows };
+      fallback = { slot, rows };
+      break; // the biggest size for this many boards is too small, so allow another board
+    }
+  }
+  return fallback ?? { slot: 10, rows: [words] };
 }
 
 function drawAnswer(popLetter?: string) {
-  const width = banner.clientWidth - 24;
-  const { slot, rows } = fitAnswer(width);
+  const { slot, rows } = fitAnswer(sign.clientWidth);
   answerEl.style.setProperty('--slot', `${slot}px`);
   answerEl.replaceChildren();
   const over = lost();
-  for (const row of rows) {
+  for (const [i, row] of rows.entries()) {
     const rowEl = document.createElement('div');
     rowEl.className = 'pp-row';
+    rowEl.style.borderImageSource = `url(${art(BOARDS[i % BOARDS.length]!)})`;
     for (const word of row) {
       const wordEl = document.createElement('div');
       wordEl.className = 'pp-word';
@@ -135,29 +159,6 @@ function drawAnswer(popLetter?: string) {
   }
   const shown = [...ANSWER].map((ch) => (!isLetter(ch) ? ch : guesses.includes(fold(ch)) || over ? ch : 'blank')).join(' ');
   answerEl.setAttribute('aria-label', `${CATEGORY}: ${shown}`);
-}
-
-/** A slightly ragged outline, so the banner looks torn, not cut by a machine. */
-function tearBanner() {
-  const w = banner.offsetWidth;
-  const h = banner.offsetHeight;
-  let seed = 7;
-  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647 - 0.5) * 2;
-  const pts: string[] = [];
-  const edge = (x0: number, y0: number, x1: number, y1: number) => {
-    const n = Math.max(4, Math.round(Math.hypot(x1 - x0, y1 - y0) / 13));
-    for (let i = 0; i < n; i++) {
-      const t = i / n;
-      const jx = y0 === y1 ? 0 : rnd() * 1.6 + 1.6;
-      const jy = y0 === y1 ? rnd() * 1.6 + 1.6 : 0;
-      pts.push(`${(x0 + (x1 - x0) * t + (x0 === 0 ? jx : -jx)).toFixed(1)}px ${(y0 + (y1 - y0) * t + (y0 === 0 ? jy : -jy)).toFixed(1)}px`);
-    }
-  };
-  edge(0, 0, w, 0);
-  edge(w, 0, w, h);
-  edge(w, h, 0, h);
-  edge(0, h, 0, 0);
-  banner.style.clipPath = `polygon(${pts.join(',')})`;
 }
 
 // ---- the scene ----
@@ -265,7 +266,6 @@ function guess(ch: string) {
   showStage(stage(), true);
   describe();
   again.hidden = !(won() || lost());
-  if (lost()) tearBanner();
 }
 
 again.addEventListener('click', () => location.assign(location.pathname + location.search.replace(/([?&])g=[^&]*/, '$1')));
@@ -285,8 +285,7 @@ again.hidden = !(won() || lost());
 const refresh = () => {
   showStage(stage(), false);
   drawAnswer();
-  tearBanner();
-  layout(); // the banner's height feeds the scene's height, so lay out once more
+  layout(); // the sign's height feeds the scene's height, so lay out once more
   describe();
 };
 new ResizeObserver(refresh).observe(document.body);

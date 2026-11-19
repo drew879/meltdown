@@ -19,22 +19,26 @@ const listOnly = process.argv.includes('--list');
 /**
  * order: how the islands are numbered ('x' left to right, 'y' top to bottom,
  * 'grid' rows then columns). names: one per island, or null to skip it.
- * The two sheets of later snowman stages trade one figure each, so that the
- * stages get steadily shorter.
+ * Stages 4 to 7 were redrawn on two later sheets so that the arms and hat
+ * carry through from one stage to the next; the figures they replace are
+ * skipped with null.
  * join: how far apart (in source pixels) two bits can be and still count as
  * one piece (a sweat drop beside a head, an arm lying beside a body).
  */
 const SHEETS = [
   { src: 'snowman-0-2.png', order: 'x', join: 14, names: ['snowman-0', 'snowman-1', 'snowman-2'], hat: true },
-  { src: 'snowman-3-5.png', order: 'x', join: 14, names: ['snowman-3', 'snowman-4', 'snowman-6'], hat: true },
-  { src: 'snowman-6-8.png', order: 'x', join: 14, names: ['snowman-5', 'snowman-7', 'snowman-8'], hat: true },
-  { src: 'sun.png', order: 'grid', join: 20, names: ['sun-smug', 'sun-gleeful', 'sun-annoyed', 'sun-dismayed'], maxSide: 560 },
-  { src: 'banner-tray.png', order: 'y', join: 12, names: ['banner', 'tray'], maxSide: 1500 },
-  { src: 'pieces.png', order: 'grid', join: 10, names: [], maxSide: 420 },
+  { src: 'snowman-3-5.png', order: 'x', join: 14, names: ['snowman-3', null, null], hat: true },
+  { src: 'snowman-4-5-fix.png', order: 'x', join: 14, names: ['snowman-4', 'snowman-5'], hat: true },
+  { src: 'snowman-6-7-fix.png', order: 'x', join: 14, names: ['snowman-6', 'snowman-7'], hat: true },
+  { src: 'snowman-6-8.png', order: 'x', join: 14, names: [null, null, 'snowman-8'], hat: true },
+  { src: 'sun.png', order: 'grid', join: 20, names: ['sun-smug', 'sun-gleeful', 'sun-annoyed', 'sun-dismayed'], maxSide: 460 },
+  { src: 'planks.png', order: 'y', join: 12, names: ['plank-1', null, 'plank-3'], maxSide: 1040 },
 ];
 
 /** Pixels of hat brim the snowman is scaled to, so every stage shares one scale. */
 const HAT_WIDTH = 190;
+/** Small corrections where a figure came out a touch too tall for its place in the melt. */
+const TWEAK = { 'snowman-6': 0.9 };
 
 async function load(file) {
   const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -163,14 +167,14 @@ for (const sheet of SHEETS) {
     console.log(`  ${i} ${name ?? '(unnamed)'}: ${box.w}x${box.h} at ${box.x},${box.y}${sheet.hat ? `, hat ${hats[i]}px` : ''}`);
     if (listOnly || !name) continue;
     let scale = 1;
-    if (sheet.hat && sheetHat > 40) scale = HAT_WIDTH / sheetHat;
+    if (sheet.hat && sheetHat > 40) scale = (HAT_WIDTH / sheetHat) * (TWEAK[name] ?? 1);
     else if (sheet.maxSide) scale = Math.min(1, sheet.maxSide / Math.max(box.w, box.h));
     const outW = Math.max(1, Math.round(box.w * scale));
     const outH = Math.max(1, Math.round(box.h * scale));
     await sharp(file)
       .extract({ left: box.x, top: box.y, width: box.w, height: box.h })
       .resize(outW, outH, { kernel: 'lanczos3' })
-      .webp({ quality: 84, alphaQuality: 90, effort: 6 })
+      .webp({ quality: 80, alphaQuality: 88, effort: 6 })
       .toFile(path.join(OUT, `${name}.webp`));
     manifest[name] = { w: outW, h: outH };
   }
@@ -180,10 +184,10 @@ for (const sheet of SHEETS) {
 try {
   const plate = sharp(path.join(SRC, 'backyard.png'));
   const meta = await plate.metadata();
-  const w = 1290;
+  const w = 1242;
   const h = Math.round((meta.height / meta.width) * w);
   if (!listOnly) {
-    await plate.resize(w, h).webp({ quality: 80, effort: 6 }).toFile(path.join(OUT, 'backyard.webp'));
+    await plate.resize(w, h).webp({ quality: 78, effort: 6 }).toFile(path.join(OUT, 'backyard.webp'));
     manifest.backyard = { w, h };
   }
   console.log(`backyard.png: ${meta.width}x${meta.height} -> ${w}x${h}`);
