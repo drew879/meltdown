@@ -1,0 +1,20 @@
+{
+  "name": "meltdown",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Meltdown: a pass-and-play word-guessing game where wrong guesses melt a snowman.",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@fontsource-variable/nunito": "^5.3.0",
+    "@fontsource/bagel-fat-one": "^5.3.0",
+    "@playwright/test": "^1.65.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8"
+  }
+}
