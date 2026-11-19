@@ -177,52 +177,49 @@
 }
 
 /* ---- the answer, on a garden sign ----
-   One wooden board per row of the answer, nailed to a post. A short answer is
-   one board; a long title is a stack of up to five. */
+   One wooden sign on a post, holding one, two or three rows of the answer.
+   The script sizes the board to the answer and picks the board picture whose
+   shape is the closest match, so the wood is never stretched far. */
 .pp-sign {
   position: relative;
   z-index: 2;
-  justify-self: center;
-  width: calc(100% - 20px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
-  max-width: 600px;
-  padding: 19px 0 22px;
+  display: grid;
+  justify-items: center;
+  padding: 24px calc(env(safe-area-inset-right, 0px) + 10px) 34px calc(env(safe-area-inset-left, 0px) + 10px);
 }
-.pp-post {
-  position: absolute;
-  left: 50%;
-  top: 34px;
-  bottom: 0;
-  width: 26px;
-  margin-left: -13px;
-  border-radius: 3px 3px 7px 7px;
-  background: var(--grain), linear-gradient(90deg, #6f4b2e, #94683f 42%, #63422a);
-  box-shadow: 0 3px 4px rgba(40, 40, 10, 0.45);
+.pp-signbox {
+  --flower: 64px;
+  position: relative;
+  transform: rotate(-0.8deg);
 }
-.pp-post::after {
-  /* where it goes into the ground */
-  content: '';
-  position: absolute;
-  left: -11px;
-  right: -11px;
-  bottom: -4px;
-  height: 9px;
-  border-radius: 50%;
-  background: rgba(52, 62, 16, 0.4);
+.pp-board {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  display: grid;
+  place-content: center;
+  /* The board's ragged, nailed ends keep their shape and only the plain
+     middle stretches. The script sets the picture and the width of the ends. */
+  border-style: solid;
+  border-color: transparent;
+  border-image-repeat: stretch;
+  filter: drop-shadow(0 4px 3px rgba(40, 40, 10, 0.5));
+  color: #fbf5e6;
 }
 .pp-category {
   position: absolute;
   z-index: 3;
   left: 50%;
-  top: 0;
-  padding: 3px 20px 2px;
+  top: -17px;
+  padding: 4px 22px 3px;
   border-radius: 7px 8px 6px 9px;
   background: var(--coral) var(--grain);
   box-shadow: 0 2px 0 rgba(90, 30, 20, 0.35), 0 4px 4px rgba(40, 40, 10, 0.4);
-  font-size: 14px;
+  font-size: 15px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
   white-space: nowrap;
-  transform: translateX(-50%) rotate(-1.5deg);
+  transform: translateX(-50%) rotate(-1deg);
 }
 .pp-category::before,
 .pp-category::after {
@@ -237,40 +234,83 @@
   background: radial-gradient(circle at 35% 30%, #77706b, #3a3531 70%);
 }
 .pp-category::before {
-  left: 7px;
+  left: 8px;
 }
 .pp-category::after {
-  right: 7px;
+  right: 8px;
+}
+
+/* the post, and the flowers, snow and grass at the foot of the sign */
+.pp-bit {
+  position: absolute;
+  z-index: 2;
+  max-width: none;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 2px rgba(40, 45, 10, 0.4));
+}
+.pp-bit.post {
+  z-index: 0;
+  left: 50%;
+  bottom: -30px;
+  height: 66px;
+  transform: translateX(-50%);
+}
+.pp-bit.fl {
+  left: 0;
+  bottom: -33px;
+  height: var(--flower);
+  transform: translateX(-46%);
+}
+.pp-bit.fr {
+  right: 0;
+  bottom: -33px;
+  height: calc(var(--flower) * 0.94);
+  transform: translateX(46%);
+}
+.pp-bit.fl2 {
+  left: 0;
+  bottom: -35px;
+  height: calc(var(--flower) * 0.6);
+  transform: translateX(8%);
+}
+.pp-bit.fr2 {
+  right: 0;
+  bottom: -35px;
+  height: calc(var(--flower) * 0.62);
+  transform: translateX(-12%);
+}
+.pp-bit.sl {
+  left: 15%;
+  bottom: -36px;
+  height: 15px;
+}
+.pp-bit.sr {
+  right: 17%;
+  bottom: -36px;
+  height: 14px;
+}
+.pp-bit.gl {
+  left: 50%;
+  bottom: -34px;
+  height: 22px;
+  transform: translateX(-135%);
+}
+.pp-bit.gr {
+  left: 50%;
+  bottom: -34px;
+  height: 19px;
+  transform: translateX(40%);
 }
 .pp-answer {
   --slot: 30px;
-  --board: max(calc(var(--slot) * 2.05), 36px); /* keep in step with MIN_BOARD in the script */
-  position: relative;
   display: grid;
-  gap: 4px;
+  justify-items: center;
+  gap: calc(var(--slot) * 0.3);
 }
 .pp-row {
-  box-sizing: border-box;
-  height: var(--board);
   display: flex;
   justify-content: center;
-  align-items: center;
   gap: 0 calc(var(--slot) * 0.6);
-  /* The board's ragged, nailed ends keep their shape and only the plain
-     middle stretches, so a board can be any width. */
-  border-style: solid;
-  border-width: 0 calc(var(--board) * 0.54);
-  border-image-slice: 0 12% fill;
-  border-image-width: 0 calc(var(--board) * 0.54);
-  border-image-repeat: stretch;
-  filter: drop-shadow(0 3px 2.5px rgba(40, 40, 10, 0.45));
-  color: #fbf5e6;
-}
-.pp-row:nth-child(odd) {
-  transform: rotate(-0.6deg);
-}
-.pp-row:nth-child(even) {
-  transform: rotate(0.5deg) translateX(2px);
 }
 .pp-word {
   display: flex;
@@ -325,7 +365,7 @@
   width: calc(100% - 16px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
   max-width: 620px;
   justify-self: center;
-  margin: 30px 0 calc(env(safe-area-inset-bottom, 0px) + 10px);
+  margin: 16px 0 calc(env(safe-area-inset-bottom, 0px) + 10px);
   padding: 11px 7px 13px;
   border-radius: 20px 24px 22px 19px / 22px 19px 24px 20px;
   background: var(--kraft) var(--grain);

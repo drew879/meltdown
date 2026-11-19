@@ -32,13 +32,26 @@ const SHEETS = [
   { src: 'snowman-6-7-fix.png', order: 'x', join: 14, names: ['snowman-6', 'snowman-7'], hat: true },
   { src: 'snowman-6-8.png', order: 'x', join: 14, names: [null, null, 'snowman-8'], hat: true },
   { src: 'sun.png', order: 'grid', join: 20, names: ['sun-smug', 'sun-gleeful', 'sun-annoyed', 'sun-dismayed'], maxSide: 460 },
-  { src: 'planks.png', order: 'y', join: 12, names: ['plank-1', null, 'plank-3'], maxSide: 1040 },
+  { src: 'signs.png', order: 'y', join: 12, names: ['sign-1', 'sign-2', 'sign-3'], maxSide: 960 },
+  {
+    src: 'garden.png',
+    order: 'grid',
+    join: 10,
+    maxSide: 220,
+    names: [
+      'crocus-purple-1', 'crocus-purple-2', 'crocus-yellow-1', 'crocus-yellow-2',
+      'snow-1', 'snow-2', null, 'post',
+      null, 'grass-2', null, 'grass-4',
+    ],
+  },
 ];
 
 /** Pixels of hat brim the snowman is scaled to, so every stage shares one scale. */
 const HAT_WIDTH = 190;
 /** Small corrections where a figure came out a touch too tall for its place in the melt. */
 const TWEAK = { 'snowman-6': 0.9 };
+/** The three sign boards came out in slightly different browns; these bring them to one tone. */
+const TONE = { 'sign-2': { brightness: 0.86, saturation: 0.9 }, 'sign-3': { brightness: 0.94 } };
 
 async function load(file) {
   const { data, info } = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
@@ -171,8 +184,9 @@ for (const sheet of SHEETS) {
     else if (sheet.maxSide) scale = Math.min(1, sheet.maxSide / Math.max(box.w, box.h));
     const outW = Math.max(1, Math.round(box.w * scale));
     const outH = Math.max(1, Math.round(box.h * scale));
-    await sharp(file)
-      .extract({ left: box.x, top: box.y, width: box.w, height: box.h })
+    let piece = sharp(file).extract({ left: box.x, top: box.y, width: box.w, height: box.h });
+    if (TONE[name]) piece = piece.modulate(TONE[name]);
+    await piece
       .resize(outW, outH, { kernel: 'lanczos3' })
       .webp({ quality: 80, alphaQuality: 88, effort: 6 })
       .toFile(path.join(OUT, `${name}.webp`));

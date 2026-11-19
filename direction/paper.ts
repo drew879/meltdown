@@ -37,6 +37,8 @@ const snowman = $<HTMLImageElement>('snowman');
 const thermo = $('thermo');
 const mercury = $('mercury');
 const sign = $('sign');
+const signbox = $('signbox');
+const board = $('board');
 const answerEl = $('answer');
 const tray = $('tray');
 const again = $<HTMLButtonElement>('again');
@@ -73,67 +75,139 @@ for (let i = 1; i <= LIMIT; i++) {
 }
 
 // ---- the answer on its garden sign ----
-/** Boards are drawn from these, in turn. Cream letters need the darker two. */
-const BOARDS: Piece[] = ['plank-1', 'plank-3'];
+/** The sign holds at most this many rows. */
+const MAX_ROWS = 3;
+/** The biggest a letter gets. Shorter screens get a smaller cap, so the sign leaves room for the snowman. */
+const maxSlot = () => Math.max(20, Math.min(38, innerHeight * 0.04));
+/** A sign never gets thinner than this, however small its letters. */
+const MIN_BOARD = 40;
+/** A gap between words, in letter-widths. */
+const SPACE = 0.6;
+/**
+ * Three pictures of the same board, from long and low to nearly square.
+ * `end` is how much of the picture's width each ragged, nailed end takes.
+ */
+const SIGNS: { piece: Piece; end: number }[] = [
+  { piece: 'sign-1', end: 0.11 },
+  { piece: 'sign-2', end: 0.11 },
+  { piece: 'sign-3', end: 0.11 },
+];
 
-/** A board never gets thinner than this, however small its letters. */
-const MIN_BOARD = 36;
-const boardHeight = (slot: number) => Math.max(slot * 2.05, MIN_BOARD);
+interface Fit {
+  /** Width of one letter, in pixels. */
+  slot: number;
+  rows: string[][];
+  width: number;
+  height: number;
+  /** Width of each end of the board, in pixels. */
+  end: number;
+  sign: (typeof SIGNS)[number];
+}
 
-/** Break the answer into rows of at most `perRow` letter-widths, or null if a word cannot fit. */
-function wrap(words: string[], perRow: number): string[][] | null {
-  if (words.some((w) => [...w].length > perRow)) return null;
-  const rows: string[][] = [[]];
-  let used = 0;
-  for (const w of words) {
-    const len = [...w].length;
-    const need = used === 0 ? len : used + 0.6 + len;
-    if (need > perRow && used > 0) {
-      rows.push([w]);
-      used = len;
-    } else {
-      rows.at(-1)!.push(w);
-      used = need;
+const rowWidth = (row: string[]) => row.reduce((n, w) => n + [...w].length, 0) + SPACE * (row.length - 1);
+
+/** Split the words into exactly `count` rows so that the longest row is as short as possible. */
+function split(words: string[], count: number): string[][] {
+  let best: string[][] = [words];
+  let bestWidth = Infinity;
+  const go = (start: number, left: number, rows: string[][]) => {
+    if (left === 1) {
+      const all = [...rows, words.slice(start)];
+      const widest = Math.max(...all.map(rowWidth));
+      if (widest < bestWidth) {
+        bestWidth = widest;
+        best = all;
+      }
+      return;
+    }
+    for (let end = start + 1; end <= words.length - (left - 1); end++) go(end, left - 1, [...rows, words.slice(start, end)]);
+  };
+  go(0, count, []);
+  return best;
+}
+
+/** The biggest letters these rows can have on a sign no wider than `maxWidth`. */
+function fitRows(rows: string[][], maxWidth: number): Fit {
+  const across = Math.max(...rows.map(rowWidth), 4.5) + 0.9; // letters, plus a little air
+  const tall = 1.6 * rows.length + (rows.length === 1 ? 1.55 : 1.2); // rows, plus plain wood above and below
+  let best: Fit | null = null;
+  let bestScore = -Infinity;
+  for (const sign of SIGNS) {
+    const img = manifest[sign.piece];
+    const endPerHeight = (sign.end * img.w) / img.h; // the ends keep their shape, so they grow with the height
+    let slot = Math.min(maxSlot(), maxWidth / (across + 2 * tall * endPerHeight));
+    if (slot * tall < MIN_BOARD) slot = Math.min(slot, (maxWidth - 2 * MIN_BOARD * endPerHeight) / across);
+    slot = Math.floor(slot * 2) / 2;
+    const height = Math.max(slot * tall, MIN_BOARD);
+    const end = height * endPerHeight;
+    const inner = slot * across;
+    // how far the plain middle of the board is stretched from its natural shape
+    const natural = height * (img.w / img.h) * (1 - 2 * sign.end);
+    const stretch = Math.abs(Math.log(inner / natural));
+    // bigger letters are better, unless the wood has to be pulled far out of shape
+    const score = slot - Math.max(0, stretch - 0.6) * 40;
+    if (score > bestScore) {
+      bestScore = score;
+      best = { slot, rows, width: inner + 2 * end, height, end, sign };
     }
   }
-  return rows;
+  return best!;
 }
 
 /**
- * Lay the answer out on the sign, one board per row. Fewer boards are
- * preferred as long as the letters stay big: a short answer sits on one board,
- * and a 60-character title steps down to smaller letters on up to five.
+ * Lay the answer out on the sign. Fewer rows are preferred as long as the
+ * letters stay big: a short answer sits on one row, and a 60-character title
+ * steps down to smaller letters on three.
  */
-function fitAnswer(signWidth: number): { slot: number; rows: string[][] } {
+function fitAnswer(maxWidth: number): Fit {
   const words = ANSWER.split(' ');
-  const SIZES = [38, 34, 30, 27, 24, 22, 20, 18, 16, 15, 14, 13, 12, 11, 10];
-  const k = Math.min(1, signWidth / 420);
-  // the smallest letter size worth having on one, two, three and four boards
-  const worth = [30, 28, 22, 16].map((px) => px * k);
-  let fallback: { slot: number; rows: string[][] } | null = null;
-  for (let maxRows = 1; maxRows <= 5; maxRows++) {
-    for (const slot of SIZES) {
-      // a board's ragged, nailed ends are not written on
-      const perRow = Math.floor((signWidth - 2 * 0.54 * boardHeight(slot)) / slot);
-      const rows = wrap(words, perRow);
-      if (!rows || rows.length > maxRows) continue;
-      if (maxRows === 5 || slot >= worth[maxRows - 1]!) return { slot, rows };
-      fallback = { slot, rows };
-      break; // the biggest size for this many boards is too small, so allow another board
-    }
+  const k = Math.min(1, maxWidth / 400);
+  const worth = [30 * k, 26 * k]; // letters this big are worth keeping on one row, or on two
+  let best: Fit | null = null;
+  for (let count = 1; count <= Math.min(MAX_ROWS, words.length); count++) {
+    const fit = fitRows(split(words, count), maxWidth);
+    if (count <= worth.length && fit.slot >= worth[count - 1]!) return fit;
+    if (!best || fit.slot > best.slot) best = fit;
   }
-  return fallback ?? { slot: 10, rows: [words] };
+  return best!;
+}
+
+// the post, and the flowers, snow and grass at the foot of the sign
+const BITS: [Piece, string][] = [
+  ['post', 'post'],
+  ['snow-1', 'sl'],
+  ['snow-2', 'sr'],
+  ['grass-2', 'gl'],
+  ['grass-4', 'gr'],
+  ['crocus-yellow-2', 'fl2'],
+  ['crocus-purple-2', 'fr2'],
+  ['crocus-purple-1', 'fl'],
+  ['crocus-yellow-1', 'fr'],
+];
+for (const [piece, place] of BITS) {
+  const img = new Image();
+  img.src = art(piece);
+  img.alt = '';
+  img.className = `pp-bit ${place}`;
+  signbox.append(img);
 }
 
 function drawAnswer(popLetter?: string) {
-  const { slot, rows } = fitAnswer(sign.clientWidth);
+  const fit = fitAnswer(Math.min(600, sign.clientWidth - 40));
+  const { slot, rows } = fit;
+  board.style.width = `${fit.width}px`;
+  board.style.height = `${fit.height}px`;
+  board.style.borderWidth = `0 ${fit.end}px`;
+  board.style.borderImageSource = `url(${art(fit.sign.piece)})`;
+  board.style.borderImageSlice = `0 ${fit.sign.end * 100}% fill`;
+  board.style.borderImageWidth = `0 ${fit.end}px`;
+  signbox.style.setProperty('--flower', `${Math.max(46, Math.min(72, 30 + fit.height * 0.42))}px`);
   answerEl.style.setProperty('--slot', `${slot}px`);
   answerEl.replaceChildren();
   const over = lost();
-  for (const [i, row] of rows.entries()) {
+  for (const row of rows) {
     const rowEl = document.createElement('div');
     rowEl.className = 'pp-row';
-    rowEl.style.borderImageSource = `url(${art(BOARDS[i % BOARDS.length]!)})`;
     for (const word of row) {
       const wordEl = document.createElement('div');
       wordEl.className = 'pp-word';

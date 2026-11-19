@@ -245,13 +245,13 @@ These came from Drew's review of the first direction (a beach, drawn in code) an
 - **The bar:** "stylized, professional, and polished", and never "AI slop cartoons".
 - **Names:** the snowman and the sun have no names.
 - **Difficulty on screen:** the play screen does not show a difficulty label. The thermometer shows the misses, and the handoff screen names the difficulty.
-- **The answer:** shown as letters on dashes on a sign, well clear of the keyboard. It must never look like a row of keys. The keyboard sits in its own tray. The sign is a wooden garden sign with one board per row of the answer.
+- **The answer:** shown as letters on dashes on a sign, well clear of the keyboard. It must never look like a row of keys. The keyboard sits in its own tray. It is one wooden garden sign on a post, holding one, two or three rows, with flowers, snow and grass at its foot.
 - **Generated art:** made on Higgsfield. Models that are unlimited on Drew's plan are used first, so they cost no credits. The connector cannot use unlimited from Claude Code, so those runs go through higgsfield.ai in Chrome with the Unlimited switch on (GPT Image 2.6 was unlimited until 2026-11-26). The custom connector (`https://mcp.higgsfield.ai/mcp`) collects results and is the paid fallback, with the batch size and credit cost stated first. Rounds 1 and 2 used GPT Image 2 and cost 65 credits. Prompts live in `art/prompts/`, and viewing copies in `art/concepts/`. Mock-ups carry baked-in text and never ship; every screen is rebuilt in code.
 - **Characters in the paper look:** paper pieces animated in code like a stop-motion puppet, in place of the smooth ink-cartoon rig in `src/art/`. How the pieces are made (cut in code with paper textures, or generated as layers) is still to be settled with a prototype.
 
 ## Decisions from the cut-paper review (2026-11-19)
 
-- **Answer length:** 60 characters at most, down from 140, so the sign always fits. A word can still be up to 24 letters. Letters step down in size and wrap between words, on up to five boards.
+- **Answer length:** 60 characters at most, down from 140, so the sign always fits. A word can still be up to 24 letters. The answer sits on a single sign in at most three rows; letters step down in size and wrap between words to fit.
 - **Keys:** square paper keys in a kraft paper tray, so the snowman is the only thing that reads as snow. Right and wrong are shown by shading alone (green and grey), with no tick or cross. A wrong key is also pressed flat and faded, so the state is not carried by colour alone.
 - **The melt:** nine drawn stages, 0 (fresh) to 8 (puddle), shared by all three difficulties. A round with N misses allowed shows stage `round(misses x 8 / N)`, so every miss lands on its own picture.
 - **Winning:** the snowman is restored to his fresh form and does a fun, silly celebration, such as a dance move or a backflip.

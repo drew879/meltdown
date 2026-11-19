@@ -4,7 +4,7 @@ Purpose: the separate layers the game assembles and animates in code. Unlike rou
 
 Generated on higgsfield.ai with GPT Image 2.6 Sunburst in Unlimited mode (no credits), 2K, PNG. Unlimited mode fixes the quality at Medium and runs one image at a time.
 
-Status on 2026-11-19: prompts 1, 2, 5, 8, 9 and 10 are in use, with one figure each from prompts 3 and 4 (stage 3 and the puddle). Prompts 9 and 10 redrew stages 4 to 7 so the arms and hat carry through. Prompt 6 was generated but is not used, and prompt 7 was not run, because the banner, tray, keys, tags, pegs and thermometer are built in CSS (`src/paper/paper.css`) so they can stretch and hold live text. Each run attaches a round 2 image as the style reference, named under each heading. Originals go in `art/layers/originals/`, and `npm run art` cuts them into the pieces in `public/art/`.
+Status on 2026-11-19: prompts 1, 2, 5, 9, 10, 11 and 12 are in use, with one figure each from prompts 3 and 4 (stage 3 and the puddle). Prompts 9 and 10 redrew stages 4 to 7 so the arms and hat carry through. Prompt 8 (separate planks, one per row) was replaced by prompt 11 when the answer moved to a single sign. Prompt 6 was generated but is not used, and prompt 7 was not run, because the banner, tray, keys, tags, pegs and thermometer are built in CSS (`src/paper/paper.css`) so they can stretch and hold live text. Each run attaches a round 2 image as the style reference, named under each heading. Originals go in `art/layers/originals/`, and `npm run art` cuts them into the pieces in `public/art/`.
 
 ## Shared style sentence (ends every prompt)
 
@@ -42,7 +42,7 @@ A sheet of separate small cut-paper pieces on a fully transparent background, we
 
 Three separate blank wooden sign boards on a fully transparent background, stacked one above the other with clear space between them. Each is a single long horizontal plank cut from brown wood-grain paper, like the boards of the garden sign in the reference image: rough, slightly ragged ends, visible paper wood grain, and one small dark nail head near each end. Each plank is a little different in tone and grain. All three are completely blank, seen flat and straight on, and each one fills almost the full width of the picture.
 
-The darkest and the middle board are used; cream letters do not show well enough on the lightest.
+No longer used: stacked boards read as three signs. See prompt 11.
 
 ## 9. Snowman, stages 4 and 5 redrawn (3:2, transparent). References: the three snowman sheets
 
@@ -51,3 +51,15 @@ Two versions of the same paper snowman from the reference images, side by side w
 ## 10. Snowman, stages 6 and 7 redrawn (3:2, transparent). References: the three snowman sheets
 
 Two versions of the same paper snowman from the reference images, side by side with clear space between them, on a fully transparent background, with no ground and no backdrop. Each one is complete and not cropped, and both are drawn at the same scale as the snowmen in the references, with the hat the same size. Left: mostly melted, a low and wide mound of snow about one third of his full height, with his face on it. He has no arms attached; his two twig arms lie in the blue paper puddle beside him. The bowler hat is askew but still on his head, the scarf sags around him, and he has wide panicking eyes and an open mouth. Right: almost gone, a small lump of snow barely taller than his hat. The bowler hat is still perched on top of the lump, tilted. He has huge worried eyes, the carrot nose droops, the scarf lies half in the puddle, and his two twig arms float in the wide blue paper puddle around him. The right one is clearly smaller and lower than the left one. The same parts every time (as in prompt 4).
+
+## 11. One-piece sign boards (3:4, transparent). References: play screen 1 and the plank sheet
+
+Three separate blank wooden signboards on a fully transparent background, stacked one above the other with clear space between them, all the same width and each one a single solid piece. Top: a low, wide board, about five times as wide as it is tall. Middle: a taller board, about three times as wide as it is tall. Bottom: the tallest board, about twice as wide as it is tall. Each is one thick slab cut from warm mid-brown wood-grain paper exactly like the garden sign in the reference image: chunky, with rough, splintered, slightly ragged left and right ends, a slightly uneven top and bottom edge, long horizontal paper wood grain, a darker layered edge that gives it thickness, and one small dark nail head near each end. None of them is made of separate planks: no gaps and no seams across the face. All three are completely blank, seen flat and straight on.
+
+The game uses whichever of the three is closest in shape to the sign it needs, keeps the ends as drawn and stretches only the plain middle. The cutting script brings the three to one tone.
+
+## 12. Garden pieces (4:3, transparent). References: the backyard and play screen 1
+
+A sheet of separate small cut-paper garden pieces on a fully transparent background, laid out in three rows, well spaced so that none touch, each one complete and not cropped. Top row: two clumps of purple crocus flowers with long green leaves, and two clumps of yellow crocus flowers with long green leaves, exactly like the crocuses in the reference images. Middle row: three small, low patches of white melting snow, each a different shape, and one short, thick, upright wooden post cut from brown wood-grain paper. Bottom row: four small tufts of green grass blades. Every piece is seen from the front and has a flat bottom edge so it can stand on the ground. There is no ground, no shadow on the background and no backdrop.
+
+Used at the foot of the sign: all four crocus clumps, two snow patches, two grass tufts and the post.
