@@ -14,7 +14,8 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 - Waiting on Drew:
   1. He said "I have changes" to the single-sign version and has not listed them yet. Ask; do not guess.
   2. Answer limit: keep 60 characters (16 px letters at the limit on his phone) or lower to 45.
-  3. Approval of Phase 1, then the go-ahead for Phase 2.
+  3. The four engine calls listed under "Phase 3 engine" below: confirm or change.
+  4. Approval of Phase 1, then the go-ahead for Phase 2.
 - Nothing has been tried on a real phone. All checks so far are WebKit and Chromium through Playwright.
 
 **Next, once Phase 1 is approved**
@@ -38,6 +39,20 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 - **Show Drew options before building a look.** For visual direction he wants several generated alternatives to choose from first.
 - **The quality bar** is "stylized, professional, and polished", never "AI slop cartoons". Do not trade quality for convenience.
 - If you fail twice at the same problem, stop and say so. Drew may move the task to a more capable model.
+
+## How a check-in looks
+
+Drew reviews on his iPhone, on the same Wi-Fi as the Mac. A check-in gives him:
+
+- Screenshots sent as files, saved in `docs/phase-<n>/`. Where a mock-up exists, a side-by-side of the mock-up and the real screen.
+- The phone link: `http://<the Mac's Wi-Fi address>:5173/meltdown/<page>` (find the address with `ipconfig getifaddr en0`). Start the dev server first; it is not left running between sessions.
+- What changed, what falls short or is not done, and what was and was not tested. Say plainly when something has not been on a real phone.
+- Any cost in Higgsfield credits.
+- His open questions as a numbered plaintext block he can copy, fill in and send back.
+
+Keep sessions short: one phase or one task each. A long session costs more on every message.
+
+When another session's work is reviewed, the reviewer runs its tests and also writes a few checks of its own without reading the existing tests.
 
 ## Commands
 
