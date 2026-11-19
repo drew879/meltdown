@@ -258,4 +258,5 @@ These came from Drew's review of the first direction (a beach, drawn in code) an
 - **Losing:** the heading over the puddle is picked at random from "OH DEAR!", "MY GOD!", "HE'S... GONE!", "R.I.P. SNOWMAN!", "WHAT HAVE YOU DONE!?", "SPLOOSH!" and "BYE BYE!".
 - **Icon:** the snowman's nervous face.
 - **Hat:** the round bowler.
+- **Art sources:** the full-size generated sheets live in `art/layers/originals/` and are stored with Git LFS. `npm run art` cuts them into the pieces in `public/art/`. The Pages build only needs `public/art/`, so its checkout should not fetch LFS files. The concept mock-up originals stay local; smaller copies are tracked.
 - **Made-up names:** anything committed to the repo or sent to an image service uses made-up player names (Sam and Dad).

@@ -11,6 +11,3 @@ meltdown-brief.md
 
 # full-size generated concept art stays local; the smaller JPEG copies are tracked
 art/concepts/**/originals/
-
-# full-size generated layer sheets stay local until we decide on Git LFS; the cut pieces in public/art are tracked
-art/layers/originals/
