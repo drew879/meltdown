@@ -163,7 +163,8 @@ export function reduce(state: GameState, action: Action): Reduction {
       return { state: { ...state, phase: 'play' } };
 
     case 'guess': {
-      const round = state.round as Round;
+      const round = state.round;
+      if (!round) return refuse(state, { code: 'not-allowed', message: 'There is no round to guess in.' });
       const applied = applyGuess(round, action.letter);
       if (!applied.ok) return refuse(state, applied.error);
       const { round: nextRound, status } = applied.value;

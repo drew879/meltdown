@@ -20,7 +20,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 **Next, once Phase 1 is approved**
 
 - Phase 2: animated melt beats between stages, the win celebration (snowman restored, then a silly dance or backflip; needs new poses), and the loss sequence.
-- Phase 3 can start in parallel on different files: the game engine as pure, unit-tested logic in `src/engine/` (nothing exists there yet).
+- Phase 3 engine: **built, awaiting review** (not pushed). Pure, UI-free TypeScript in `src/engine/` with 89 Vitest tests (`npm test`). Import everything from `src/engine/index.ts`; the flow is `reduce(state, action)` in `flow.ts`, saving is `createSaveStore` in `save.ts`. Not wired into any screen yet. Judgment calls and open questions are in the session report; the match rules are in `match.ts`.
 
 **Known gaps**
 
@@ -46,6 +46,7 @@ npm run dev      # dev server on the local network, http://localhost:5173/meltdo
 npm run check    # type-check, tap through a round, and fit-test the sign (needs the dev server running)
 npm run art      # cut the generated sheets into the pieces in public/art/
 npm run build    # type-check and build
+npm test         # engine unit tests (Vitest)
 ```
 
 `node scripts/shot.mjs <url> <out.png> [width] [height] [scale] [chromium|webkit] [selector]` takes a screenshot and fails on console errors. Add `?still` to a page's URL to freeze animation for screenshots.

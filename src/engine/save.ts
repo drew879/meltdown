@@ -49,7 +49,11 @@ export function serializeState(state: GameState): string {
   return JSON.stringify(envelope);
 }
 
-export function parseSave(text: string | null): LoadResult {
+export function parseSave(
+  text: string | null,
+  currentVersion: number = SAVE_VERSION,
+  migrations: Record<number, (state: unknown) => unknown> = MIGRATIONS,
+): LoadResult {
   const fresh = (status: LoadStatus): LoadResult => ({ state: createInitialState(), status });
   if (text === null) return fresh('fresh');
   let envelope: unknown;
@@ -63,10 +67,10 @@ export function parseSave(text: string | null): LoadResult {
   }
   let version = envelope.version;
   let state: unknown = envelope.state;
-  if (version > SAVE_VERSION || version < 1) return fresh('incompatible');
+  if (version > currentVersion || version < 1) return fresh('incompatible');
   try {
-    while (version < SAVE_VERSION) {
-      const migrate = MIGRATIONS[version];
+    while (version < currentVersion) {
+      const migrate = migrations[version];
       if (!migrate) return fresh('incompatible');
       state = migrate(state);
       version += 1;
