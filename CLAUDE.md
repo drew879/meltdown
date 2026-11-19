@@ -20,7 +20,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 **Next, once Phase 1 is approved**
 
 - Phase 2: animated melt beats between stages, the win celebration (snowman restored, then a silly dance or backflip; needs new poses), and the loss sequence.
-- Phase 3 engine: **built, awaiting review** (not pushed). Pure, UI-free TypeScript in `src/engine/` with 89 Vitest tests (`npm test`). Import everything from `src/engine/index.ts`; the flow is `reduce(state, action)` in `flow.ts`, saving is `createSaveStore` in `save.ts`. Not wired into any screen yet. Judgment calls and open questions are in the session report; the match rules are in `match.ts`.
+- Phase 3 engine: **built on Sonnet, reviewed on Fable and pushed** (2026-11-19). Pure, UI-free TypeScript in `src/engine/` with 89 Vitest tests (`npm test`). Import everything from `src/engine/index.ts`; the flow is `reduce(state, action)` in `flow.ts`, saving is `createSaveStore` in `save.ts`. Not wired into any screen yet. Calls made where the brief was silent, for Drew to confirm: a "1 game" match can end in a draw; a rematch keeps the names and each player's last difficulty; letters that do not fold to one A to Z letter (ß, æ, ø) are rejected like other alphabets; the default match length is Endless. The match rules are in `match.ts`.
 
 **Known gaps**
 
