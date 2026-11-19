@@ -235,3 +235,16 @@ Everything above is the original brief, unchanged. These points were agreed in t
 **Working agreement**
 
 - Work in progress is pushed to a `dev` branch. `main` only receives builds Drew has approved.
+
+## Decisions from the Phase 1 review (2026-11-19)
+
+These came from Drew's review of the first direction (a beach, drawn in code) and of the generated concept rounds. They take precedence over the brief and over the amendments above where they differ.
+
+- **Setting:** a backyard in early spring, as the snow starts to thaw. This replaces the beach.
+- **Look:** handmade cut paper (look C in `art/concepts/round-1/`). This replaces "thick ink outlines and flat colour" in the art direction section. The rest of that section still applies, translated into paper: springy motion, an interface made of the same stuff as the art, a thematic danger meter, and snow and heat as motifs.
+- **The bar:** "stylized, professional, and polished", and never "AI slop cartoons".
+- **Names:** the snowman and the sun have no names.
+- **Difficulty on screen:** the play screen does not show a difficulty label. The thermometer shows the misses, and the handoff screen names the difficulty.
+- **The answer:** shown as letters on dashes on a sign, well clear of the keyboard. It must never look like a row of keys. The keyboard sits in its own tray.
+- **Generated art:** made through the Higgsfield custom connector (`https://mcp.higgsfield.ai/mcp`) with GPT Image 2, paid from Drew's credits, with the batch size and cost stated first. Prompts live in `art/prompts/`, and viewing copies in `art/concepts/`. Mock-ups carry baked-in text and never ship; every screen is rebuilt in code.
+- **Characters in the paper look:** paper pieces animated in code like a stop-motion puppet, in place of the smooth ink-cartoon rig in `src/art/`. How the pieces are made (cut in code with paper textures, or generated as layers) is still to be settled with a prototype.

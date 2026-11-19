@@ -1,0 +1,35 @@
+# Round 2: the cut-paper look, applied to the game
+
+Drew picked look C (cut paper) from round 1. This round shows that look on the screens and characters the game needs.
+
+Generated with GPT Image 2 on Higgsfield, 2k, high quality, paid with credits. Every request attaches the round 1 cut-paper image (`art/concepts/round-1/c-cut-paper.jpg`) as the style and character reference. Results are saved in `art/concepts/round-2/`.
+
+Each prompt is one scene paragraph below followed by the shared style paragraph.
+
+## Shared style paragraph
+
+STYLE: handmade cut-paper diorama, matching the attached reference image exactly. Every element is cut from coloured paper and card and layered in depth, with crisp scissor-cut edges, visible paper fibre and soft real shadows between the layers, photographed straight on under soft studio light. Palette: spring greens, sky blue, snow white, sun yellow, kraft brown and one coral accent. The snowman is the same character as in the reference (small black bowler hat with a coral band, coral and cream striped scarf, carrot nose, round paper eyes, black paper buttons, twig arms) but with a friendlier, more likable face: a wobbly nervous smile, never gritted teeth. The sun is the same yellow paper sun with a smug, half-lidded face. Polished, professional mobile game art. No watermark, no signature.
+
+## 1. Gameplay screen, garden sign (9:16)
+
+A mock-up of the main play screen of a mobile word-guessing game in which wrong guesses melt a snowman, portrait 9:16. From top to bottom. Top strip: two small paper name tags, the left one reading "SAM 2" and the right one reading "DAD 1". Upper half: a backyard in early spring with a wooden fence and patches of thawing snow; the snowman stands in the middle, slightly melted, slumping a little with one bead of sweat and a small puddle; the smug sun is in the upper right; on the left edge stands a tall paper thermometer with six notches, its red filled to the second notch. Below the scene: a wooden garden sign on a post, with a small coral tag reading "ANIMAL". The sign shows the half-solved answer POLAR BEAR with only the letters A, R and E revealed, as large white paper letters sitting on short dashes: blank, blank, blank, A, R, then a gap, then blank, E, A, R. The blanks are empty dashes. There are no boxes or tiles around the letters; they must not look like buttons. Then a clear gap of plain grass. Bottom third: the keyboard in its own rounded kraft-paper tray, three rows of small cream paper keys in QWERTY order (QWERTYUIOP, ASDFGHJKL, ZXCVBNM). The keys E, R and A are green with a small tick, and the keys T and S are faded grey with a small cross. All lettering exactly as given, and no other text.
+
+## 2. Gameplay screen, pegged banner (9:16)
+
+A mock-up of the main play screen of a mobile word-guessing game in which wrong guesses melt a snowman, portrait 9:16. From top to bottom. Top strip: two small paper name tags, the left one reading "SAM 2" and the right one reading "DAD 1". Upper half: a backyard in early spring with a wooden fence and patches of thawing snow; the snowman stands in the middle, slightly melted, slumping a little with one bead of sweat and a small puddle; the smug sun is in the upper left; on the right edge stands a tall paper thermometer with six notches, its red filled to the second notch. Across the middle of the screen: a length of string with a wide cream paper banner pegged to it by two wooden clothes pegs, and a small luggage tag reading "ANIMAL". The banner shows the half-solved answer POLAR BEAR with only the letters A, R and E revealed, as large dark paper letters sitting on short dashes: blank, blank, blank, A, R, then a gap, then blank, E, A, R. The blanks are empty dashes. There are no boxes or tiles around the letters; they must not look like buttons. Then a clear gap. Bottom third: the keyboard on its own tray shaped like a soft white snowbank, three rows of round paper keys in QWERTY order (QWERTYUIOP, ASDFGHJKL, ZXCVBNM). The keys E, R and A are green with a small tick, and the keys T and S are faded grey with a small cross. All lettering exactly as given, and no other text.
+
+## 3. Snowman melt stages (3:2)
+
+A character sheet on a plain pale blue paper background, landscape. The same snowman is shown six times in a row from left to right, melting in six clear stages. One: fresh and proud, hat tipped, a big confident smile, both twig arms up. Two: one bead of sweat, the scarf drooping, a nervous smile. Three: slumping, one twig arm dropped on the ground, a button sliding down. Four: half melted, shorter and wider, the hat slipping, worried eyebrows. Five: a low mound, both arms gone, wide panicking eyes, a growing blue paper puddle. Six: only a blue paper puddle with the hat floating, the carrot bobbing and the two eyes still looking up, sheepish and funny, not sad. Every stage has a clearly different silhouette. Small paper numbers 1 to 6 sit under the stages. No other text.
+
+## 4. Expressions (3:2)
+
+An expression sheet on a plain pale blue paper background, landscape. Top row: the paper sun's face in four moods, from left to right: smug with half-lidded eyes, gleeful with a huge grin, annoyed with a pout and a raised eyebrow, and sulking as a grey paper cloud slides over him. Bottom row: the snowman's head and shoulders, with hat and scarf, in four moods, from left to right: a confident ham, nervous with a bead of sweat, panicking with wide eyes and an open mouth, and cheering in triumph with paper snowflakes falling around him. No text.
+
+## 5. App icons (1:1)
+
+A sheet of four app icon designs in a two by two grid on a neutral grey paper background. Each icon is a rounded square. Top left: a close-up of the snowman's face with his bowler hat, one bead of sweat and a nervous smile, on sky blue. Top right: the smug sun peeking over the top of the snowman's hat, on sky blue. Bottom left: the bowler hat floating on a small blue puddle with the carrot and two eyes looking up, on spring green. Bottom right: the snowman from the chest up with the sun's yellow rays filling the corner behind him, on sky blue. Bold, simple shapes that read clearly at a very small size. No text at all.
+
+## 6. Lost round (9:16)
+
+A mock-up of the result screen after a lost round of a mobile word-guessing game, portrait 9:16. Upper two thirds: the backyard in early spring. The snowman has melted completely into a blue paper puddle: his bowler hat floats on it, the carrot bobs beside it, the striped scarf is draped over the edge, the two twig arms lie on the grass, and his two eyes look up from the puddle, sheepish and blinking. Above, the sun grins, delighted with himself. It is a silly sight gag, never sad. A cut-paper heading above the puddle reads "SPLOOSH!". Below the scene: a wooden garden sign showing the full answer "POLAR BEAR" as large paper letters on short dashes, with the letters P, O, L and B in coral and the letters A, R and E in white. There are no boxes around the letters. At the bottom: one large rounded yellow paper button reading "NEXT ROUND". All lettering exactly as given, and no other text.
