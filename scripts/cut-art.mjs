@@ -32,7 +32,7 @@ const SHEETS = [
   { src: 'snowman-6-7-fix.png', order: 'x', join: 14, names: ['snowman-6', 'snowman-7'], hat: true },
   { src: 'snowman-6-8.png', order: 'x', join: 14, names: [null, null, 'snowman-8'], hat: true },
   { src: 'sun.png', order: 'grid', join: 20, names: ['sun-smug', 'sun-gleeful', 'sun-annoyed', 'sun-dismayed'], maxSide: 460 },
-  { src: 'signs.png', order: 'y', join: 12, names: ['sign-1', 'sign-2', 'sign-3'], maxSide: 960 },
+  { src: 'signs.png', order: 'y', join: 12, names: ['sign-1', 'sign-2', 'sign-3'], maxSide: 960, unnail: true },
   {
     src: 'garden.png',
     order: 'grid',
@@ -156,6 +156,68 @@ function hatWidth({ data, w }, box) {
   return best;
 }
 
+/**
+ * Paint out the nail heads near each end of a sign board: with the post in
+ * the middle, nails at the ends hold nothing (Drew, 2026-11-20). A nail is a
+ * round, grey blob in the outer fifth of the board. Each is covered with the
+ * wood a little further in, which shares the horizontal grain, blended in
+ * towards the edge of the patch. Returns how many nails it removed.
+ */
+function removeNails(px, w, h) {
+  const grey = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) {
+    const x = i % w;
+    if (x > w * 0.2 && x < w * 0.8) continue;
+    const r = px[i * 4], g = px[i * 4 + 1], b = px[i * 4 + 2];
+    if (px[i * 4 + 3] > 200 && Math.max(r, g, b) - Math.min(r, g, b) < 28 && r < 150) grey[i] = 1;
+  }
+  let removed = 0;
+  const seen = new Uint8Array(w * h);
+  for (let i = 0; i < w * h; i++) {
+    if (!grey[i] || seen[i]) continue;
+    let x0 = w, y0 = h, x1 = -1, y1 = -1, area = 0;
+    const stack = [i];
+    seen[i] = 1;
+    while (stack.length) {
+      const p = stack.pop();
+      const px0 = p % w;
+      const py0 = (p - px0) / w;
+      area++;
+      x0 = Math.min(x0, px0); x1 = Math.max(x1, px0);
+      y0 = Math.min(y0, py0); y1 = Math.max(y1, py0);
+      for (const q of [p - 1, p + 1, p - w, p + w]) {
+        if (q < 0 || q >= w * h || !grey[q] || seen[q]) continue;
+        if ((q === p - 1 && px0 === 0) || (q === p + 1 && px0 === w - 1)) continue;
+        seen[q] = 1;
+        stack.push(q);
+      }
+    }
+    const bw = x1 - x0 + 1;
+    const bh = y1 - y0 + 1;
+    if (area < 300 || bw / bh > 1.6 || bh / bw > 1.6) continue; // specks and grain, not nails
+    const cx = (x0 + x1) / 2;
+    const cy = (y0 + y1) / 2;
+    const rad = Math.max(bw, bh) / 2;
+    const dx = Math.round(rad * 3) * (cx < w / 2 ? 1 : -1);
+    const inner = rad * 1.3; // the head and its shadow
+    const outer = rad * 1.75; // blended out to here
+    for (let y = Math.floor(cy - outer); y <= Math.ceil(cy + outer); y++) {
+      for (let x = Math.floor(cx - outer); x <= Math.ceil(cx + outer); x++) {
+        const d = Math.hypot(x - cx, y - cy);
+        const sx = x + dx;
+        if (d > outer || y < 0 || y >= h || x < 0 || x >= w || sx < 0 || sx >= w) continue;
+        const u = d <= inner ? 0 : (d - inner) / (outer - inner);
+        const t = 1 - u * u * (3 - 2 * u);
+        const o = (y * w + x) * 4;
+        const so = (y * w + sx) * 4;
+        for (let c = 0; c < 3; c++) px[o + c] = Math.round(px[o + c] * (1 - t) + px[so + c] * t);
+      }
+    }
+    removed++;
+  }
+  return removed;
+}
+
 const manifest = {};
 await mkdir(OUT, { recursive: true });
 await mkdir(path.dirname(MANIFEST), { recursive: true });
@@ -185,6 +247,11 @@ for (const sheet of SHEETS) {
     const outW = Math.max(1, Math.round(box.w * scale));
     const outH = Math.max(1, Math.round(box.h * scale));
     let piece = sharp(file).extract({ left: box.x, top: box.y, width: box.w, height: box.h });
+    if (sheet.unnail) {
+      const { data, info } = await piece.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      console.log(`    removed ${removeNails(data, info.width, info.height)} nail heads`);
+      piece = sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } });
+    }
     if (TONE[name]) piece = piece.modulate(TONE[name]);
     await piece
       .resize(outW, outH, { kernel: 'lanczos3' })
