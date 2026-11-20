@@ -87,6 +87,7 @@ The site is served under `/meltdown/` in development too, to match `https://drew
 | Path | What it is |
 | --- | --- |
 | `BRIEF.md` | The brief and every decision since. Add new decisions there, dated. |
+| `BACKLOG.md` | Feature ideas and feedback to pick up later. Add new ones there; move built ones to "Done". |
 | `index.html`, `src/paper/play.ts` | The front page: the play screen, with stand-in game rules. Query: `?a=answer&c=category&limit=4,6 or 8&g=letters already guessed`. |
 | `.github/workflows/deploy.yml` | Tests, builds and publishes every push to `dev` to GitHub Pages. |
 | `src/paper/paper.css` | The paper look: name tags, sign, keys, tray, thermometer. |
