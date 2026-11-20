@@ -6,33 +6,42 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 
 **Every session ends by updating "Where things stand" below**, so the next session, on any model, can pick up without the conversation.
 
-## Where things stand (updated 2026-11-19)
+## Where things stand (updated 2026-11-20)
 
-**Phase 1 (direction) is not approved yet.** Drew is reviewing the play screen built in the cut-paper look.
+**The game goes live from `dev`.** Every push to `dev` publishes to https://drew879.github.io/meltdown/ (decided 2026-11-20; see `BRIEF.md`). The first run (2026-11-20) passed the tests and built, but GitHub refused the publish: the `github-pages` environment did not allow branch `dev`. Waiting on Drew to allow `dev` there (Settings > Environments > github-pages > Deployment branches and tags) and to confirm Settings > Pages > Source is "GitHub Actions". Then re-run the failed deploy job, or push again.
 
-- Done and pushed: a tappable stand-in round at `direction/paper.html`, in the approved look. One garden sign with up to three rows, nine melt stages, four sun moods, square keys in a paper tray.
-- Waiting on Drew:
-  1. He said "I have changes" to the single-sign version and has not listed them yet. Ask; do not guess.
-  2. Answer limit: keep 60 characters (16 px letters at the limit on his phone) or lower to 45.
-  3. The four engine calls listed under "Phase 3 engine" below: confirm or change.
-  4. Approval of Phase 1, then the go-ahead for Phase 2.
+- Live now: the Phase 1 stand-in round is the front page (`index.html`, code in `src/paper/play.ts`). The answer comes from the URL and the names and scores are fixed, so it is not a playable game yet.
+- The answer limit is 45 characters (engine, sign and checks). At the limit, letters are 22 px at Drew's phone size (440x956).
+- The four engine calls are confirmed (`BRIEF.md`, 2026-11-20).
+
+**Next: Step 2, make it playable.** Agreed with Drew on 2026-11-20; confirm he is ready before starting.
+
+- One app page that shows the screen for `state.phase`, driven by `reduce` in `src/engine/flow.ts`, saving after every action with `createSaveStore`.
+- The play screen reads the engine's round instead of its own stand-in rules, with real names and scores.
+- Plain screens built from the paper pieces that exist, with no new art: names and match length; setup (answer with a hide toggle, category with Other, difficulty preset to the setter's last pick); handoff (who is guessing, the difficulty, "It's me", a way back); result (heading, the full answer with missed letters marked, Next round); match over (winner, Rematch, New game). New game sits behind a confirmation on every screen. A calm notice shows if storage is unavailable.
+- A browser check that plays full rounds (win, loss, refresh mid-round, new game) at 320, 393 and 440 px.
+- Then a code review, a push to `dev`, and Drew plays it on his phone.
+
+**Still open from Phase 1** (none of it blocks Step 2)
+
+- Drew said "I have changes" to the single-sign version and has not listed them yet. Ask; do not guess.
+- Approval of Phase 1.
 - Nothing has been tried on a real phone. All checks so far are WebKit and Chromium through Playwright.
 
-**Next, once Phase 1 is approved**
+**After Step 2:** Phase 2 animation (melt beats, the win celebration with new poses, the loss sequence), designed versions of the new screens (mock-up options first), Phase 4 audio, the rest of Phase 5 (icon, offline play, update prompt, README, moving the live site to `main`), and Phase 6 QA.
 
-- Phase 2: animated melt beats between stages, the win celebration (snowman restored, then a silly dance or backflip; needs new poses), and the loss sequence.
-- Phase 3 engine: **built on Sonnet, reviewed on Fable and pushed** (2026-11-19). Pure, UI-free TypeScript in `src/engine/` with 89 Vitest tests (`npm test`). Import everything from `src/engine/index.ts`; the flow is `reduce(state, action)` in `flow.ts`, saving is `createSaveStore` in `save.ts`. Not wired into any screen yet. Calls made where the brief was silent, for Drew to confirm: a "1 game" match can end in a draw; a rematch keeps the names and each player's last difficulty; letters that do not fold to one A to Z letter (ß, æ, ø) are rejected like other alphabets; the default match length is Endless. The match rules are in `match.ts`.
+**Phase 3 engine:** built on Sonnet, reviewed on Fable and pushed (2026-11-19). Pure, UI-free TypeScript in `src/engine/` with 89 Vitest tests (`npm test`). Import everything from `src/engine/index.ts`; the flow is `reduce(state, action)` in `flow.ts`, saving is `createSaveStore` in `save.ts`. Not wired into any screen yet. The match rules are in `match.ts`.
 
 **Known gaps**
 
-- No iPad layout yet. Screens 320 px wide work but are cramped.
-- Art is 1.5 MB. The target is well under 2 MB for the first load, so later melt stages should load after the first screen.
-- The first direction (a beach, drawn in code) is still in the repo: `src/art/`, `src/ui/`, `direction/index.html`, `direction/play.html`, `direction/board.*`. It was replaced by the paper look. Delete it once Phase 1 is approved; ask first.
+- No iPad layout yet. Screens 320 px wide work but are cramped; a 24-letter single word there gets 9.5 px letters.
+- Art is 1.46 MB. The target is well under 2 MB for the first load, so later melt stages should load after the first screen.
+- The first direction (a beach, drawn in code) is still in the repo: `src/art/`, `src/ui/`, `direction/index.html`, `direction/play.html`, `direction/board.*`. It was replaced by the paper look and is not in the build. Delete it once Phase 1 is approved; ask first.
 
 ## How we work
 
 - **Check in at the end of each phase and wait.** Do not start the next phase until Drew says so. If a question is open in either direction, confirm before building.
-- **Push work in progress to `dev`. Never push to `main`** without Drew's approval of that milestone. GitHub's default branch is `dev` only because the repo started empty; switch it to `main` at the first approved push.
+- **Push work in progress to `dev`; every push to `dev` goes live**, so keep it working. **Never push to `main`** without Drew's approval of that milestone. GitHub's default branch is `dev` only because the repo started empty; switch it to `main` at the first approved push.
 - **Commit in small steps** with clear messages.
 - **Never commit the son's name or age**, and never send them to an outside service. Mock-ups and test data use "Sam" and "Dad".
 - **Look at your own work.** Take screenshots and read them before showing Drew. Run `npm run check` before every commit that touches the play screen.
@@ -45,7 +54,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 Drew reviews on his iPhone, on the same Wi-Fi as the Mac. A check-in gives him:
 
 - Screenshots sent as files, saved in `docs/phase-<n>/`. Where a mock-up exists, a side-by-side of the mock-up and the real screen.
-- The phone link: `http://<the Mac's Wi-Fi address>:5173/meltdown/<page>` (find the address with `ipconfig getifaddr en0`). Start the dev server first; it is not left running between sessions.
+- The phone link: https://drew879.github.io/meltdown/ once the work is pushed to `dev` (a few minutes after the push). For work not yet pushed, `http://<the Mac's Wi-Fi address>:5173/meltdown/<page>` (find the address with `ipconfig getifaddr en0`); start the dev server first, it is not left running between sessions.
 - What changed, what falls short or is not done, and what was and was not tested. Say plainly when something has not been on a real phone.
 - Any cost in Higgsfield credits.
 - His open questions as a numbered plaintext block he can copy, fill in and send back.
@@ -66,6 +75,8 @@ npm test         # engine unit tests (Vitest)
 
 `node scripts/shot.mjs <url> <out.png> [width] [height] [scale] [chromium|webkit] [selector]` takes a screenshot and fails on console errors. Add `?still` to a page's URL to freeze animation for screenshots.
 
+Cloud sessions have Chromium but no WebKit. Preload `scripts/use-chromium.mjs` to run the checks there: `node --import ./scripts/use-chromium.mjs scripts/check-play.mjs`. Set `MELTDOWN_URL` to check another server, such as `npx vite preview` at `http://localhost:4173/meltdown/`.
+
 The site is served under `/meltdown/` in development too, to match `https://drew879.github.io/meltdown/`.
 
 ## Map
@@ -73,7 +84,8 @@ The site is served under `/meltdown/` in development too, to match `https://drew
 | Path | What it is |
 | --- | --- |
 | `BRIEF.md` | The brief and every decision since. Add new decisions there, dated. |
-| `direction/paper.html`, `direction/paper.ts` | The play screen, with stand-in game rules. Query: `?a=answer&c=category&limit=4,6 or 8&g=letters already guessed`. |
+| `index.html`, `src/paper/play.ts` | The front page: the play screen, with stand-in game rules. Query: `?a=answer&c=category&limit=4,6 or 8&g=letters already guessed`. |
+| `.github/workflows/deploy.yml` | Tests, builds and publishes every push to `dev` to GitHub Pages. |
 | `src/paper/paper.css` | The paper look: name tags, sign, keys, tray, thermometer. |
 | `src/paper/art-manifest.json` | Sizes of the cut pieces. Written by `npm run art`; do not edit by hand. |
 | `public/art/` | The cut pieces the game loads (WebP). Written by `npm run art`. |
@@ -81,7 +93,7 @@ The site is served under `/meltdown/` in development too, to match `https://drew
 | `art/prompts/` | Every image prompt, with which model, settings and reference images. |
 | `art/concepts/` | Mock-ups from the direction rounds. Reference only; they never ship. |
 | `docs/phase-1/` | Screenshots shown to Drew at check-ins. |
-| `scripts/` | `cut-art.mjs`, `shot.mjs`, `check-play.mjs`, `check-sign.mjs`. |
+| `scripts/` | `cut-art.mjs`, `shot.mjs`, `check-play.mjs`, `check-sign.mjs`, `use-chromium.mjs`. |
 
 ## How the art is made
 
@@ -108,8 +120,9 @@ Use models that are unlimited on Drew's plan first, so nothing costs credits. St
 
 ## Things that will bite later
 
-- **Deploy:** Drew's `gh` token lacks the `workflow` scope. Before the Actions workflow can be pushed (Phase 5) he must run `gh auth refresh -s workflow`.
-- **Pages build:** it needs only `public/art/`, so its checkout should not fetch LFS files.
+- **Deploy:** changing `.github/workflows/` from the Mac needs `gh auth refresh -s workflow` first, because Drew's `gh` token lacks that scope. Pushes from cloud sessions through the Claude GitHub App could add the workflow (2026-11-20).
+- **Pages branch rule:** Pages deploys only from branches its `github-pages` environment allows (Settings > Environments > github-pages). On 2026-11-20 it did not allow `dev`, even though `dev` is the default branch, and the first deploy was refused. Keep `dev` on that list, including when the default branch moves to `main`.
+- **Pages build:** it needs only `public/art/`, so its checkout does not fetch LFS files.
 - **Git LFS** is turned on for this clone only (`git lfs install --local`).
 - **Audio (Phase 4):** sound must play with the iPhone silent switch on. Music is written as MIDI, then rebuilt in Ableton Live 12 and exported as stems; Claude controls Live only when Drew says he is free. Claude cannot hear, so Drew's ears are the test.
 - **Devices:** iPhone 16 Pro Max opened from a Home Screen icon is the main target; a 2018 iPad Pro is the performance floor. Support iOS 17 and later.
