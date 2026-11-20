@@ -24,9 +24,10 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 
 **Still open from Phase 1** (none of it blocks Step 2)
 
-- Drew said "I have changes" to the single-sign version and has not listed them yet. Ask; do not guess.
+- Drew said "I have changes" to the single-sign version and has not listed them yet. Reminded him on 2026-11-20; if he has none, close it. Do not guess.
 - Approval of Phase 1.
-- Nothing has been tried on a real phone. All checks so far are WebKit and Chromium through Playwright.
+- First real-phone look (2026-11-20): the live page loads and looks good on Drew's iPhone.
+- **Melt stage 3 runs backwards.** Drew saw the snowman get taller going into the arm-lift pose. Stage 3 came from a different sheet (`snowman-3-5.png`): its hat sits above stage 2's (786 vs 780 px), and it is slimmer and more upright with a waving arm. Shrinking it to 94% fixes the height but leaves a smaller hat and a slimmer body, so 3 to 4 then looks like widening; see `docs/phase-1/11-melt-stage-3.jpg`. Recommended fix: redraw stage 3 between stages 2 and 4, ideally in the same generation round as Phase 2's win poses, before the free GPT Image 2.6 window ends on 2026-11-26. Waiting on Drew.
 
 **After Step 2:** Phase 2 animation (melt beats, the win celebration with new poses, the loss sequence), designed versions of the new screens (mock-up options first), Phase 4 audio, the rest of Phase 5 (icon, offline play, update prompt, README, moving the live site to `main`), and Phase 6 QA.
 
