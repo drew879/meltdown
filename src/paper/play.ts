@@ -1,17 +1,17 @@
-// Phase 1 proof: the play screen built for real in the cut-paper look.
+// The play screen in the cut-paper look, served as the site's front page.
 // The rules here are a small stand-in so the screen can be tapped through;
 // the real engine, with tests, comes in Phase 3.
 //
 // Query: ?a=answer  &c=category  &limit=4|6|8  &g=letters already guessed
-import '../src/paper/paper.css';
-import manifest from '../src/paper/art-manifest.json';
+import './paper.css';
+import manifest from './art-manifest.json';
 
 type Piece = keyof typeof manifest;
 const art = (name: Piece) => `${import.meta.env.BASE_URL}art/${name}.webp`;
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
 /** Longest answer the banner is built to hold. */
-export const MAX_ANSWER = 60;
+export const MAX_ANSWER = 45;
 
 const params = new URLSearchParams(location.search);
 const ANSWER = (params.get('a') ?? 'Six Flags Great Adventure').trim().replace(/\s+/g, ' ').slice(0, MAX_ANSWER);
@@ -156,7 +156,7 @@ function fitRows(rows: string[][], maxWidth: number): Fit {
 
 /**
  * Lay the answer out on the sign. Fewer rows are preferred as long as the
- * letters stay big: a short answer sits on one row, and a 60-character title
+ * letters stay big: a short answer sits on one row, and a 45-character title
  * steps down to smaller letters on three.
  */
 function fitAnswer(maxWidth: number): Fit {

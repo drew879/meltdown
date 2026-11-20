@@ -6,8 +6,9 @@
 //   node scripts/check-sign.mjs
 import { webkit } from '@playwright/test';
 
-const URL = process.env.MELTDOWN_URL ?? 'http://localhost:5173/meltdown/direction/paper.html';
-const LONG = 'Alexander and the Terrible, Horrible, No Good, Very Bad Day';
+const URL = process.env.MELTDOWN_URL ?? 'http://localhost:5173/meltdown/';
+/** As long as an answer can be: 45 characters. */
+const LONG = 'Indiana Jones and the Raiders of the Lost Ark';
 /** answer, screen width, screen height */
 const CASES = [
   ['Cat', 320, 568],

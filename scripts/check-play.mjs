@@ -4,11 +4,11 @@
 //   npm run dev            (in another terminal; the page must be served)
 //   node scripts/check-play.mjs [folder for screenshots]
 //
-// This checks the Phase 1 stand-in page (direction/paper.html). When the real
+// This checks the stand-in round on the front page (index.html). When the real
 // game exists, its browser tests replace this.
 import { webkit } from '@playwright/test';
 
-const URL = process.env.MELTDOWN_URL ?? 'http://localhost:5173/meltdown/direction/paper.html';
+const URL = process.env.MELTDOWN_URL ?? 'http://localhost:5173/meltdown/';
 const shots = process.argv[2];
 const problems = [];
 const expect = (ok, what) => ok || problems.push(what);
