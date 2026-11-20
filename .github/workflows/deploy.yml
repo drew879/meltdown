@@ -1,0 +1,49 @@
+# Publishes the game to https://drew879.github.io/meltdown/ on every push to dev.
+# dev is the live, latest build; main is kept for milestones Drew has approved.
+# One-time setup: Settings > Pages > Source > "GitHub Actions".
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a newer push replaces one still waiting.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # The site only needs public/art/, so the full-size sheets in Git LFS are not fetched.
+      - uses: actions/checkout@v5
+        with:
+          lfs: false
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
