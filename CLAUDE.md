@@ -8,7 +8,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 
 ## Where things stand (updated 2026-11-20)
 
-**The game goes live from `dev`.** Every push to `dev` publishes to https://drew879.github.io/meltdown/ (decided 2026-11-20; see `BRIEF.md`). The first run (2026-11-20) passed the tests and built, but GitHub refused the publish: the `github-pages` environment did not allow branch `dev`. Waiting on Drew to allow `dev` there (Settings > Environments > github-pages > Deployment branches and tags) and to confirm Settings > Pages > Source is "GitHub Actions". Then re-run the failed deploy job, or push again.
+**The game goes live from `dev`.** Every push to `dev` publishes to https://drew879.github.io/meltdown/ (decided 2026-11-20; see `BRIEF.md`). Drew changed the Pages settings on 2026-11-20 so `dev` can publish. Cloud sessions cannot re-run or start the workflow by hand (the Claude GitHub App gets a 403), so redeploy by pushing to `dev`.
 
 - Live now: the Phase 1 stand-in round is the front page (`index.html`, code in `src/paper/play.ts`). The answer comes from the URL and the names and scores are fixed, so it is not a playable game yet.
 - The answer limit is 45 characters (engine, sign and checks). At the limit, letters are 22 px at Drew's phone size (440x956).
