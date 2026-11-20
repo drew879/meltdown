@@ -260,3 +260,12 @@ These came from Drew's review of the first direction (a beach, drawn in code) an
 - **Hat:** the round bowler.
 - **Art sources:** the full-size generated sheets live in `art/layers/originals/` and are stored with Git LFS. `npm run art` cuts them into the pieces in `public/art/`. The Pages build only needs `public/art/`, so its checkout should not fetch LFS files. The concept mock-up originals stay local; smaller copies are tracked.
 - **Made-up names:** anything committed to the repo or sent to an image service uses made-up player names (Sam and Dad).
+
+## Decisions from 2026-11-20
+
+Drew wanted a live version to play and iterate on sooner. These take precedence over everything above where they differ.
+
+- **A live site now.** Every push to `dev` publishes to `https://drew879.github.io/meltdown/` through GitHub Actions, so the live site is always the latest build. `main` is kept for milestones Drew has approved. This replaces "a workflow on pushes to `main`" in the deployment section and brings the deploy forward from Phase 5; the rest of Phase 5 (icons, offline play, the update prompt) stays there.
+- **Playable before polished.** Plain versions of Phase 3's screens (names and match length, setup, handoff, result, match over) come next, wired to the engine and built from the paper pieces that already exist, with no new art. Phase 2's animation, and designed versions of these screens (with mock-up options first), follow on the live site. Phase 1 stays open meanwhile.
+- **Answer length:** 45 characters at most, down from 60. A word can still be up to 24 letters.
+- **Engine calls confirmed:** a "1 game" match can end in a draw; a rematch keeps the names and each player's last difficulty; letters that do not fold to one A to Z letter (ß, æ, ø) are rejected like other alphabets; the default match length is Endless.
