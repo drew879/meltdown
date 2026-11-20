@@ -1,7 +1,7 @@
 import { charLength, fail, ok, tidy, type Result } from './types';
 
-/** Longest answer in characters. Drew may lower this to 45. */
-export const ANSWER_MAX_LENGTH = 60;
+/** Longest answer in characters (lowered from 60 on 2026-11-20). */
+export const ANSWER_MAX_LENGTH = 45;
 /** Longest single word, so it fits on the sign. */
 export const WORD_MAX_LENGTH = 24;
 

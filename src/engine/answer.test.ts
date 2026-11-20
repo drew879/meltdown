@@ -33,11 +33,11 @@ describe('answer validation', () => {
     expect(r.ok && r.value.answer).toBe('polar bear');
   });
   it('limits the answer to ANSWER_MAX_LENGTH characters', () => {
-    expect(ANSWER_MAX_LENGTH).toBe(60);
-    const ok60 = ('abcdefghi ').repeat(6).trim() + 'a'.repeat(60 - 59);
-    expect(Array.from(ok60).length).toBe(60);
-    expect(validateAnswer(ok60).ok).toBe(true);
-    const r = validateAnswer(ok60 + 'a');
+    expect(ANSWER_MAX_LENGTH).toBe(45);
+    const ok45 = 'abcdefghi '.repeat(4) + 'abcde';
+    expect(Array.from(ok45).length).toBe(45);
+    expect(validateAnswer(ok45).ok).toBe(true);
+    const r = validateAnswer(ok45 + 'a');
     expect(!r.ok && r.error.code).toBe('answer-too-long');
   });
   it('limits single words to 24 characters', () => {
