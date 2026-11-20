@@ -14,7 +14,9 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 - The answer limit is 45 characters (engine, sign and checks). At the limit, letters are 22 px at Drew's phone size (440x956).
 - The four engine calls are confirmed (`BRIEF.md`, 2026-11-20).
 
-**Next: Step 2, make it playable.** Agreed with Drew on 2026-11-20; confirm he is ready before starting.
+**Now: art round 4, which Drew is running** (agreed 2026-11-20). Prompts in `art/prompts/round-4-stage-3-and-win.md`: melt stage 3 redrawn (keeping the waving arm), and two win-celebration options (a backflip, a little dance) for Drew to pick from, plus an optional cloud and snowflakes. When he says they are done, collect them through the Higgsfield connector (`show_generations`) or ask him for the files, save them in `art/layers/originals/`, add them to `SHEETS` in `scripts/cut-art.mjs` (stage 3 is the middle figure of its sheet), run `npm run art`, and show him a lineup of stages 2 to 4.
+
+**Next: Step 2, make it playable.** Agreed with Drew on 2026-11-20. He asked for the art round first; confirm whether Step 2 can run alongside it before starting.
 
 - One app page that shows the screen for `state.phase`, driven by `reduce` in `src/engine/flow.ts`, saving after every action with `createSaveStore`.
 - The play screen reads the engine's round instead of its own stand-in rules, with real names and scores.
@@ -24,10 +26,10 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 
 **Still open from Phase 1** (none of it blocks Step 2)
 
-- Drew said "I have changes" to the single-sign version and has not listed them yet. Reminded him on 2026-11-20; if he has none, close it. Do not guess.
+- Drew's sign change (2026-11-20): the nail heads at the board's ends looked odd with nothing behind them. Done: `scripts/cut-art.mjs` paints them out. Asked him whether the category tag's two nails, which sit just above the board's top edge, should come down onto the wood.
 - Approval of Phase 1.
 - First real-phone look (2026-11-20): the live page loads and looks good on Drew's iPhone.
-- **Melt stage 3 runs backwards.** Drew saw the snowman get taller going into the arm-lift pose. Stage 3 came from a different sheet (`snowman-3-5.png`): its hat sits above stage 2's (786 vs 780 px), and it is slimmer and more upright with a waving arm. Shrinking it to 94% fixes the height but leaves a smaller hat and a slimmer body, so 3 to 4 then looks like widening; see `docs/phase-1/11-melt-stage-3.jpg`. Recommended fix: redraw stage 3 between stages 2 and 4, ideally in the same generation round as Phase 2's win poses, before the free GPT Image 2.6 window ends on 2026-11-26. Waiting on Drew.
+- **Melt stage 3 runs backwards** (being redrawn in round 4). Drew saw the snowman get taller going into the arm-lift pose. Stage 3 came from a different sheet (`snowman-3-5.png`): its hat sits above stage 2's (786 vs 780 px), and it is slimmer and more upright with a waving arm. Shrinking it to 94% fixes the height but leaves a smaller hat and a slimmer body, so 3 to 4 then looks like widening; see `docs/phase-1/11-melt-stage-3.jpg`. Drew chose a redraw (not the shrink), in the same round as the win poses.
 
 **After Step 2:** Phase 2 animation (melt beats, the win celebration with new poses, the loss sequence), designed versions of the new screens (mock-up options first), Phase 4 audio, the rest of Phase 5 (icon, offline play, update prompt, README, moving the live site to `main`), and Phase 6 QA.
 
@@ -106,7 +108,7 @@ The site is served under `/meltdown/` in development too, to match `https://drew
 Rules of thumb that cost time to learn:
 
 - **Melt stages:** nine pictures, 0 (fresh) to 8 (puddle), shared by all difficulties. A round with N misses allowed shows stage `round(misses * 8 / N)`. All nine are cut to one scale, taken from the hat's width.
-- **The sign:** one board holding one to three rows. Three board pictures exist (long, medium, tall); the script picks the closest shape, keeps the ragged ends as drawn and stretches only the middle. Rows are split so the longest is as short as possible.
+- **The sign:** one board holding one to three rows. Three board pictures exist (long, medium, tall); the script picks the closest shape, keeps the ragged ends as drawn and stretches only the middle. Rows are split so the longest is as short as possible. The cutting script paints out the nail heads drawn at the board's ends.
 - **Motion** is stop-motion: stepped poses (`steps()`), not smooth glides. Honour `prefers-reduced-motion`.
 
 ## Generating images (Higgsfield)
@@ -126,6 +128,7 @@ Use models that are unlimited on Drew's plan first, so nothing costs credits. St
 - **Pages build:** it needs only `public/art/`, so its checkout does not fetch LFS files.
 - **Checking the live site:** the first successful deploy was run 3 on 2026-11-20. Cloud sessions cannot load `drew879.github.io` (the network policy blocks it), so they confirm a deploy from the Actions run and Drew checks the page on his phone.
 - **Git LFS** is turned on for this clone only (`git lfs install --local`).
+- **Re-cutting art in a fresh clone:** the originals arrive as LFS pointer files. Run `git lfs pull` before `npm run art`, or every sheet it cannot read is skipped and its pieces drop out of the manifest. With the originals present, a re-cut reproduces the committed pieces byte for byte (checked 2026-11-20), so `git status` shows exactly what a change touched.
 - **Audio (Phase 4):** sound must play with the iPhone silent switch on. Music is written as MIDI, then rebuilt in Ableton Live 12 and exported as stems; Claude controls Live only when Drew says he is free. Claude cannot hear, so Drew's ears are the test.
 - **Devices:** iPhone 16 Pro Max opened from a Home Screen icon is the main target; a 2018 iPad Pro is the performance floor. Support iOS 17 and later.
 

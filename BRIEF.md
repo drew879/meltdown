@@ -269,3 +269,7 @@ Drew wanted a live version to play and iterate on sooner. These take precedence 
 - **Playable before polished.** Plain versions of Phase 3's screens (names and match length, setup, handoff, result, match over) come next, wired to the engine and built from the paper pieces that already exist, with no new art. Phase 2's animation, and designed versions of these screens (with mock-up options first), follow on the live site. Phase 1 stays open meanwhile.
 - **Answer length:** 45 characters at most, down from 60. A word can still be up to 24 letters.
 - **Engine calls confirmed:** a "1 game" match can end in a draw; a rematch keeps the names and each player's last difficulty; letters that do not fold to one A to Z letter (ß, æ, ø) are rejected like other alphabets; the default match length is Endless.
+- **Melt stage 3** is redrawn so it sits between stages 2 and 4: shorter than stage 2, at least as wide, with the hat the same size. It keeps the waving arm. The old one stood taller and slimmer than stage 2, so the melt seemed to run backwards.
+- **Win celebration:** two options are generated in the same round, a backflip and a little dance, four stop-motion poses each. Drew picks one.
+- **The sign** has no nail heads at its ends, since nothing behind them would hold a nail. The cutting script paints them out.
+- **Drew runs the generations himself** on higgsfield.ai, from the prompts in `art/prompts/round-4-stage-3-and-win.md`.
