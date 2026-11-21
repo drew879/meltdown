@@ -12,7 +12,9 @@
 // The melt: the beat on a wrong guess, quick taps during it, the loss (the hat
 // left hanging) and how long it takes, the answer staying off the sign until
 // it ends, a tap to skip it, a refresh on a lost round, and a phone that asks
-// for reduced motion.
+// for reduced motion. Once, at one size: the melt's pieces left out of the
+// first load and fetched with the play screen, the New game confirmation's
+// keys while the melt plays, a resize during it, and a new game cutting it off.
 // Made-up names only: Sam and Dad.
 import { webkit } from '@playwright/test';
 
@@ -468,6 +470,57 @@ for (const [w, h] of SIZES) {
     q.say(/meltdown/i.test(await text(q.page)), 'a broken save should leave a new game');
     await q.context.close();
   }
+}
+
+// ===== the melt's pictures, and the New game confirmation over the melt (once, at one size) =====
+{
+  const p = await newPhone(393, 852, 'melt pictures and keys', { init: () => performance.setResourceTimingBufferSize(1000) });
+  const { page, say } = p;
+  const MELT_PIECES = ['puddle', 'puddle-hat', 'puddle-carrot', 'puddle-eyes', 'puddle-eyes-closed', 'hat-6', 'hat-7', 'sun-flare', 'heat-1', 'heat-2', 'drop'];
+  /** The melt pieces the page has fetched so far. */
+  const got = async () => {
+    const names = await page.evaluate(() => performance.getEntriesByType('resource').map((e) => e.name.split('/').pop()));
+    return MELT_PIECES.filter((n) => names.includes(`${n}.webp`));
+  };
+  const firstLoad = await got();
+  say(firstLoad.length === 0, `the melt's loose pieces should not be part of the first load, got ${firstLoad.join(', ')}`);
+  await enterNames(p, 'Dad', 'Sam');
+  await setSecret(p, { answer: 'Cat', category: 'Animal', difficulty: 'Hard' });
+  await page.getByRole('button', { name: "It's me" }).click();
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(300);
+  const loaded = await got();
+  say(loaded.length === MELT_PIECES.length, `every melt piece, heat and drops included, should be fetched once the play screen is up, before the first miss; missing ${MELT_PIECES.filter((n) => !loaded.includes(n)).join(', ')}`);
+
+  // the confirmation opened while the melt plays: its keys are for its buttons, not for skipping the melt
+  for (const ch of ['X', 'Q', 'Z']) await tap(p, ch);
+  await tap(p, 'W');
+  await page.locator('.pp-menu').click();
+  await page.keyboard.press('Enter'); // on Keep playing, which has the focus
+  say((await page.locator('.pp-dialog').count()) === 0, 'Enter on Keep playing should close the confirmation while the melt plays');
+  say((await resultShown(page)) === false && (await page.locator('.pp-slot.missed').count()) === 0, 'Enter on the confirmation should not skip the melt');
+  if (await page.locator('.pp-dialog').count()) await page.getByRole('button', { name: 'Keep playing' }).click(); // so a failure above is reported, not a time-out below
+  await page.locator('.pp-menu').click();
+  await page.keyboard.press('Escape');
+  say((await page.locator('.pp-dialog').count()) === 0, 'Escape should close the confirmation while the melt plays');
+  say((await resultShown(page)) === false && (await page.locator('.pp-slot.missed').count()) === 0, 'Escape on the confirmation should not skip the melt');
+  // a resize while the melt plays keeps the answer off the sign
+  await page.setViewportSize({ width: 440, height: 956 });
+  await page.waitForTimeout(150);
+  say((await resultShown(page)) === false && (await page.locator('#answer').getAttribute('aria-label')) === 'Animal: blank blank blank', 'a resize during the melt should keep the answer off the sign');
+
+  // a new game started while the melt plays: nothing of it may keep running
+  await page.locator('.pp-menu').click();
+  await page.locator('.pp-dialog').getByRole('button', { name: 'New game' }).click();
+  await page.evaluate(() => {
+    window.frames_ = 0;
+    const request = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (cb) => request((t) => (window.frames_++, cb(t)));
+  });
+  await page.waitForTimeout(2500);
+  say(/meltdown/i.test(await text(page)), 'New game during the melt should go back to the names screen');
+  say((await page.evaluate(() => window.frames_)) === 0, 'the melt should stop drawing when the play screen goes away');
+  await p.context.close();
 }
 
 await browser.close();
