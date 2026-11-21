@@ -46,6 +46,21 @@ const SHEETS = [
   { src: 'win-backflip.png', order: 'grid', join: 14, names: ['win-backflip-1', 'win-backflip-2', 'win-backflip-3', 'win-backflip-4'], hat: true },
   // A cloud to roll over the sun, then six snowflakes, for the win.
   { src: 'win-sky.png', order: 'grid', join: 10, names: ['cloud', 'flake-1', 'flake-2', 'flake-3', 'flake-4', 'flake-5', 'flake-6'], maxSide: 900 },
+  // Round 7 (art/prompts/round-7-melt-pieces.md): the puddle taken apart for the
+  // loss, and the hats of stages 6 and 7. The pieces come from three sheets,
+  // because no one sheet got everything right:
+  // - melt-puddle-base.png: the bare puddle, drawn alone from stage 8 so that its
+  //   outline and scarf sit where stage 8's do (on the seven-piece sheets the
+  //   scarf lay too high and ran under the hat). Cut to stage 8's width, 615.
+  // - melt-puddle.png (the second run of the seven-piece prompt): the hat,
+  //   carrot and eyes lying in the puddle. Its own puddle and hats are skipped.
+  // - melt-hats.png (the first run of the same prompt): the loose hats of stages
+  //   6 and 7, whose tilt matched the stages better than the second run's.
+  { src: 'melt-puddle-base.png', order: 'x', join: 14, names: ['puddle'], maxSide: 615 },
+  { src: 'melt-puddle.png', order: 'grid', join: 14, names: [null, 'puddle-hat', 'puddle-carrot', 'puddle-eyes', 'puddle-eyes-closed', null, null], hat: true },
+  { src: 'melt-hats.png', order: 'grid', join: 14, names: [null, null, null, null, null, 'hat-6', 'hat-7'], hat: true },
+  // Round 7: the flare ring behind the sun, two heat wiggles and the sweat and splash drop, for the miss beat.
+  { src: 'melt-heat.png', order: 'x', join: 12, maxSide: 640, maxSides: { 'heat-1': 200, 'heat-2': 200, drop: 120 }, names: ['sun-flare', 'heat-1', 'heat-2', 'drop'] },
   { src: 'sun.png', order: 'grid', join: 20, names: ['sun-smug', 'sun-gleeful', 'sun-annoyed', 'sun-dismayed'], maxSide: 460 },
   { src: 'signs.png', order: 'y', join: 12, names: ['sign-1', 'sign-2', 'sign-3'], maxSide: 960, unnail: true },
   {
@@ -97,11 +112,25 @@ const HAT_WIDTH = 190;
  * 499, 487, 476 across the snow. This is the right size, not a fudge.
  * Backflip poses: the same effect left them 6 to 12 percent small (by hat area)
  * beside the fresh snowman, so the sheet is scaled up to match stage 0's hat.
+ * Round 7's loose pieces were not drawn at one scale on their sheet, so each is
+ * brought to the size it has in the stage it comes from (the game lays each
+ * one down on its own, so they need not share a factor):
+ * puddle-carrot and the two puddle-eyes were drawn 25% and 39% too big beside
+ * the hat lying in the puddle, which itself needs no correction (253 x 190
+ * against 250 x 177 in stage 8, hat area within 2%); the eyes share one factor
+ * because the game swaps one for the other.
+ * hat-6 and hat-7: 9% too big; at 0.912 they are 239 x 213 and 224 x 186 against
+ * 239 x 212 and 224 x 193 on stages 6 and 7.
  */
 const TWEAK = {
   'snowman-3': 1.096,
   'snowman-6': 0.9,
   ...Object.fromEntries([1, 2, 3, 4].map((n) => [`win-backflip-${n}`, 1.1])),
+  'puddle-carrot': 0.8,
+  'puddle-eyes': 0.72,
+  'puddle-eyes-closed': 0.72,
+  'hat-6': 0.912,
+  'hat-7': 0.912,
 };
 /** The three sign boards came out in slightly different browns; these bring them to one tone. */
 const TONE = { 'sign-2': { brightness: 0.86, saturation: 0.9 }, 'sign-3': { brightness: 0.94 } };

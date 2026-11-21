@@ -93,3 +93,35 @@ Cutting it. Add to `SHEETS`:
 ## Weight
 
 The stand-ins weigh about 0.35 MB as PNG. As WebP the eleven pieces should add about 0.15 MB. None of them is needed for the first screen: `src/paper/art.ts` leaves the win celebration's pictures out of `preloadArt()`, and these should be left out the same way (the list is `MELT_PIECES` in `src/paper/melt-timeline.ts`).
+
+## Result (2026-11-21)
+
+Run by Claude in Drew's Chrome: GPT Image 2.6 Sunburst on Unlimited (the Generate button read UNLIMITED before every run, so no credits), 3:2, 2K, Transparent, PNG, the references uploaded from `art/layers/originals/` in the order given above. Five runs in all. All eleven pieces are cut under the names above, but the puddle's pieces come from three sheets instead of one, because no single run got everything right. `SHEETS` and `TWEAK` in `scripts/cut-art.mjs` say the same in their comments.
+
+### The puddle's pieces: prompt 1 run twice, then the puddle alone
+
+Prompt 1 was run twice, unchanged. Both runs gave seven clean pieces in the right order (`npm run art -- --list` showed 7 at `join: 14`), but neither drew them at one scale: beside the hats, the puddle was 20% too small and the carrot and eyes 25 to 40% too big. Since the game lays each piece down on its own, each is cut to the size it has in its stage, with its own `TWEAK`.
+
+- **`melt-puddle.png` is the second run.** From it: `puddle-hat` (no correction: 253 x 190 against 250 x 177 in stage 8, hat area within 2%), `puddle-carrot` (x0.8, 128 x 80), `puddle-eyes` and `puddle-eyes-closed` (both x0.72, 147 x 85 and 147 x 83). Its eyes have flat pupils with a highlight, like stage 8's; the first run's were glossy beads.
+- **`melt-hats.png` is the first run.** From it: `hat-6` and `hat-7` (both x0.912: 239 x 213 and 224 x 186 against 239 x 212 and 224 x 193 on the stages). The second run's hats were flatter than the stages' (`hat-7` came out 226 x 175) and showed a doubled hat when laid over stage 7.
+- **`melt-puddle-base.png` is the bare puddle, drawn alone.** On both seven-piece sheets the scarf lay too high on the puddle, so at the game's rest places the hat sat on top of it. One more run with only `snowman-6-8.png` attached and the prompt below gave a puddle whose outline and scarf sit where stage 8's do. It is cut to stage 8's width (`maxSide: 615`, 615 x 269). Its felt is a little finer than stage 8's because it was drawn large.
+
+```text
+One single cut-paper piece on a fully transparent background, complete and not cropped, with no ground, no backdrop and no shadow on the background: the melted snowman's puddle from the right-hand figure of the reference image, copied exactly and drawn large in the middle of the picture. It is the same wide blue felt-paper puddle with the same wavy outline, and the same coral and cream striped scarf lies in exactly the same place, across the lower right of the puddle with its fringe hanging past the puddle's lower right edge. Three things are taken away: the black bowler hat, the orange carrot nose and the two eyes. Where they were there is only plain blue puddle, and the puddle's top edge carries on in a smooth wavy line where the hat used to cover it. Nothing else is changed and nothing is added. Handmade cut-paper style matching the attached reference image exactly: pieces cut from coloured paper and card, crisp scissor-cut edges, visible paper fibre, gentle layered depth, soft even studio light. No text, no letters, no numbers, no watermark.
+```
+
+For whoever tunes `REST` in `src/paper/melt-timeline.ts`: the real `puddle` is 269 px tall and includes the scarf's fringe down to its bottom edge, as stage 8 does, where the stand-in was 256 tall and sat 8 px up. With `REST.puddle.bottom` at 0 its top edge lands within about 4 px of stage 8's; at 8 the whole puddle sits 8 px high against the hat, carrot and eyes. It reads fine either way.
+
+### The flare, heat and drop: prompt 2 run twice
+
+Prompt 2 was run twice, unchanged; **`melt-heat.png` is the second run.** Its flare has the suns' felt and a cut edge (the first was flat card), and its drop is the blue of the sweat bead (the first was pale). Both cut into 4 pieces at `join: 12`. `sun-flare` is 640 x 640, twelve rays, plain middle; `heat-1` and `heat-2` are 70 and 73 x 200; `drop` is 75 x 120, point up.
+
+### Checked
+
+- `docs/phase-2/melt-pieces.png`: the loose hats beside stages 6 and 7, and the puddle and its pieces beside stage 8, on one baseline.
+- `docs/phase-2/melt-rest-and-hats.png`: top row, stage 8, then the pieces laid at the game's rest places with the eyes open and closed; bottom row, each loose hat laid half-transparent over its stage.
+- `docs/phase-2/melt-hats-on-stages.png`: for stages 6 and 7, the stand-in hat cut from the stage, the new hat, the stage, and the stage with the new hat on it.
+- `docs/phase-2/melt-heat-pieces.png`: the flare behind three suns at 1.3, 1.55 (turned) and 1.75 times the sun's width; the wiggles and the drop beside stage 2.
+- In the game (Chromium, 440 px wide, real pieces picked up from the manifest): `docs/phase-2/melt-in-game-miss.png` (a miss on Normal), `melt-in-game-loss-normal.png` (the hat hangs from stage 7) and `melt-in-game-loss-hard.png` (from stage 6).
+
+The eleven pieces weigh 0.18 MB as WebP.
