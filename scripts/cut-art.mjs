@@ -60,13 +60,17 @@ const SHEETS = [
 /** Pixels of hat brim the snowman is scaled to, so every stage shares one scale. */
 const HAT_WIDTH = 190;
 /**
- * Small corrections where a figure came out a touch too tall for its place in the melt.
- * snowman-3 (redrawn 2026-11-21): the sheet put a stage 5 on its right, so the
- * middle figure came out 689 px tall, shorter than stage 4's 729. Scaled up to
- * 755 it sits evenly between stage 2 (780) and stage 4. The hat grows with it,
- * to 215 px against 205 and 193 either side. Set it to 1 for the figure as drawn.
- * Win poses: drawn 6 to 19 percent smaller (by hat area) than the fresh
- * snowman they replace, so each sheet is scaled up to match stage 0's hat.
+ * Corrections where the sheet's scale lands a figure the wrong size beside its
+ * neighbours. hatWidth() counts black pixels on one row, so a hat that sits
+ * straight reads wider than the same hat tilted, and its sheet is cut too small.
+ * snowman-6: came out a touch too tall for its place in the melt.
+ * snowman-3 (redrawn 2026-11-21): its hat sits straight (224 px on a row), where
+ * every earlier stage's hat is tilted, so it was cut 9.6% small: 689 px tall,
+ * shorter than stage 4's 729. At 1.096 the hat's area is within 1% of stage 2's
+ * and the figure steps evenly between stages 2 and 4: 780, 755, 729 tall and
+ * 499, 487, 476 across the snow. This is the right size, not a fudge.
+ * Win poses: the same effect left them 6 to 19 percent small (by hat area)
+ * beside the fresh snowman, so each sheet is scaled up to match stage 0's hat.
  */
 const TWEAK = {
   'snowman-3': 1.096,
