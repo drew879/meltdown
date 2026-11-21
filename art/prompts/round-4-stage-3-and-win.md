@@ -4,7 +4,7 @@ Purpose: replace melt stage 3, which stood taller and slimmer than stage 2 so th
 
 Model and settings: higgsfield.ai, GPT Image 2.6 Sunburst in Unlimited mode (no credits; the free grant was due to end on 2026-11-26), 2K, Transparent background, PNG. Unlimited fixes quality at Medium and runs one image at a time. Run each prompt two or three times so there are versions to choose from. Attach the references named under each heading from the "+" button: the same pictures are in the Generations tab, or upload the files from `art/layers/originals/`. Do not attach `snowman-3-5.png`; it holds the stage 3 being replaced.
 
-Originals go in `art/layers/originals/` and `npm run art` cuts them. Notes for cutting: every figure must be a separate island (clear space between them, and the hat always touching the figure), and the scale comes from the widest hat on the sheet.
+Save the one version you like best from each prompt in `art/layers/originals/` as `snowman-3-redraw.png` (prompt 1), `win-backflip.png` (prompt 2), `win-dance.png` (prompt 3) and `win-sky.png` (prompt 4); these names are listed in `SHEETS` in `scripts/cut-art.mjs`. Keep other versions out of that folder. Run `npm run art -- --list` first: it should find 3, 4, 4 and 7 pieces on those sheets. If a count is off (a fallen arm or a lifted hat counted as a piece of its own), the names would land on the wrong figures, so fix that before running `npm run art`. Notes for cutting: every figure must be a separate island (clear space between them, and the hat always touching the figure), and the scale comes from the widest hat on the sheet.
 
 Each prompt below is complete; copy it as it is.
 
