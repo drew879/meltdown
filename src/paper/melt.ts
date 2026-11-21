@@ -199,9 +199,12 @@ export function createMelt(scene: HTMLElement, snowman: HTMLImageElement, sun: H
   let whenAtRest: (() => void) | null = null;
 
   // Nothing plays before its pictures are in: a beat asked for sooner is simply not shown.
+  // The heat and the drops are drawn by the pools, which only set their addresses when a beat
+  // needs them, so they are fetched here too; otherwise the first beat on a slow phone has none.
+  const bitPictures = (['heat-1', 'heat-2', 'drop'] as const).map((name) => img(pieces[name].src, name));
   let ready = false;
   let wantRest = false;
-  void Promise.all([...bodies.values(), ...loose, flare].map((picture) => picture.decode().catch(() => undefined))).then(() => {
+  void Promise.all([...bodies.values(), ...loose, flare, ...bitPictures].map((picture) => picture.decode().catch(() => undefined))).then(() => {
     ready = true;
     if (wantRest && mode === 'idle') rest(performance.now());
   });
