@@ -6,5 +6,6 @@ export default defineConfig({
   base: '/meltdown/',
   server: { port: 5173, strictPort: true },
   preview: { port: 4173, strictPort: true },
-  build: { target: 'es2022' },
+  // celebrate.html is a mock-up page for the win celebration, not part of the game
+  build: { target: 'es2022', rollupOptions: { input: { main: 'index.html', celebrate: 'celebrate.html' } } },
 });
