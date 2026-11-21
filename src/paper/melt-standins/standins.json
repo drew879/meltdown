@@ -1,0 +1,59 @@
+{
+  "note": "Written by make-standins.mjs: each stand-in's size and where its middle sat in the stage it was cut from.",
+  "puddle": {
+    "w": 601,
+    "h": 256,
+    "x": 0,
+    "y": 136
+  },
+  "puddle-hat": {
+    "w": 250,
+    "h": 177,
+    "x": 53.5,
+    "y": 285.5
+  },
+  "puddle-carrot": {
+    "w": 129,
+    "h": 75,
+    "x": -127,
+    "y": 142.5
+  },
+  "puddle-eyes": {
+    "w": 149,
+    "h": 79,
+    "x": -76,
+    "y": 196.5
+  },
+  "puddle-eyes-closed": {
+    "w": 149,
+    "h": 79
+  },
+  "hat-6": {
+    "w": 239,
+    "h": 212,
+    "x": -70.5,
+    "y": 383
+  },
+  "hat-7": {
+    "w": 224,
+    "h": 193,
+    "x": -58,
+    "y": 284.5
+  },
+  "sun-flare": {
+    "w": 640,
+    "h": 640
+  },
+  "heat-1": {
+    "w": 100,
+    "h": 160
+  },
+  "heat-2": {
+    "w": 100,
+    "h": 160
+  },
+  "drop": {
+    "w": 92,
+    "h": 120
+  }
+}
