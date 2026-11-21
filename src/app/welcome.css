@@ -1,0 +1,304 @@
+/* The welcome screen (names and match length), built from the paper pieces of
+   art round 6. Everything here is scoped to .welcome so the other screens keep
+   their plain cards. The tag, tab, strip, chips and button are blank paper
+   pictures, each stretched whole over its box (stretching in slices left hairline
+   seams); their addresses arrive as --w-* variables set by namesScreen in
+   screens.ts. */
+
+.welcome .pp-scroll {
+  padding-left: calc(env(safe-area-inset-left, 0px) + 8px);
+  padding-right: calc(env(safe-area-inset-right, 0px) + 8px);
+}
+.pp-w {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  display: grid;
+  justify-items: center;
+  /* a taller phone gets more air between the pieces; a short one keeps them close */
+  gap: clamp(12px, 2.1vh, 24px);
+}
+
+/* ---- the flowers and snow: decoration only, and always behind the fields ---- */
+.pp-w-art {
+  position: absolute;
+  max-width: none;
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 3px rgba(40, 50, 15, 0.32));
+}
+/* at the foot of the fence, either side of the snowman */
+.pp-stage .snowdrop-1 {
+  left: 1%;
+  bottom: 4%;
+  width: clamp(44px, 15vw, 70px);
+}
+.pp-stage .primrose-2 {
+  left: 12%;
+  bottom: 0;
+  width: clamp(50px, 17vw, 78px);
+}
+.pp-stage .tulip-1 {
+  right: 2%;
+  bottom: 3%;
+  width: clamp(46px, 15.5vw, 72px);
+}
+.pp-stage .hyacinth-2 {
+  right: 14%;
+  bottom: 0;
+  width: clamp(40px, 14vw, 62px);
+}
+
+/* the sign, planted in the grass, with its flowers at the two feet */
+.pp-w-signbox {
+  position: relative;
+  width: 100%;
+  margin-top: -14px;
+}
+.pp-w-sign {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 6px 5px rgba(40, 50, 15, 0.4));
+}
+.pp-w-signbox .snow-1 {
+  left: -2%;
+  bottom: -9%;
+  width: 27%;
+}
+.pp-w-signbox .hyacinth-1 {
+  left: 0;
+  bottom: -5%;
+  width: 14%;
+}
+.pp-w-signbox .snowdrop-2 {
+  left: 12%;
+  bottom: -7%;
+  width: 11%;
+}
+.pp-w-signbox .snow-2 {
+  right: -2%;
+  bottom: -9%;
+  width: 27%;
+}
+.pp-w-signbox .primrose-1 {
+  right: 3%;
+  bottom: -6%;
+  width: 16%;
+}
+.pp-w-signbox .tulip-2 {
+  right: 17%;
+  bottom: -6%;
+  width: 11%;
+}
+/* the pieces that lie beside the sign sit behind it; the ones in front of the feet sit above */
+.pp-w-signbox .snow-1,
+.pp-w-signbox .snow-2 {
+  z-index: 0;
+}
+.pp-w-signbox .hyacinth-1,
+.pp-w-signbox .snowdrop-2,
+.pp-w-signbox .primrose-1,
+.pp-w-signbox .tulip-2 {
+  z-index: 2;
+}
+
+/* ---- the tagline, on a blank cream tag ---- */
+.pp-w-lead {
+  position: relative;
+  box-sizing: border-box;
+  margin: 0;
+  width: min(80%, 340px);
+  padding: 15px 22px 17px;
+  background: var(--w-tag) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 3px 3px rgba(40, 50, 15, 0.3));
+  font-size: clamp(14px, 4vw, 17px);
+  font-weight: 900;
+  line-height: 1.25;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* ---- the form: name tags, the strip of chips, the button ---- */
+.pp-w-form {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: clamp(16px, 2.6vh, 30px);
+  width: 100%;
+}
+.pp-w-names {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  padding-top: 14px;
+}
+.pp-w-field {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+.pp-w-tab {
+  position: absolute;
+  z-index: 1;
+  left: 6%;
+  top: -13px;
+  box-sizing: border-box;
+  max-width: 94%;
+  padding: 5px 12px 6px;
+  background: var(--w-tab) center / 100% 100% no-repeat;
+  font-size: clamp(9.5px, 3vw, 12px);
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  line-height: 1.15;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  filter: drop-shadow(0 2px 2px rgba(40, 50, 15, 0.3));
+}
+.pp-w-tag {
+  display: grid;
+  align-items: end;
+  box-sizing: border-box;
+  height: clamp(66px, 19vw, 82px);
+  padding: 10px 18px 12px;
+  background: var(--w-tag) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 3px 3px rgba(40, 50, 15, 0.3));
+}
+.pp-w-tag:focus-within {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+  border-radius: 18px;
+}
+.pp-w-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 36px;
+  padding: 0 2px;
+  border: 0;
+  border-bottom: 2.5px solid var(--charcoal);
+  border-radius: 0;
+  background: transparent;
+  color: var(--charcoal);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  outline: none;
+  /* the page turns text selection off; fields on iPhone need it back */
+  user-select: text;
+  -webkit-user-select: text;
+}
+.pp-w-input::placeholder {
+  color: rgba(58, 53, 49, 0.4);
+}
+
+/* the kraft strip holds the chips and, under them, what the choice means */
+.pp-w-strip {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 17px 16px 14px;
+  background: var(--w-strip) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 3px 3px rgba(40, 50, 15, 0.32));
+  display: grid;
+  gap: 6px;
+}
+.pp-w-strip .pp-field {
+  gap: 0;
+}
+.pp-w-strip legend {
+  /* still read aloud, but the chips say it on their own for a reader */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.pp-w-strip .pp-chips {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.pp-w-strip .pp-chip span {
+  position: relative;
+  box-sizing: border-box;
+  min-height: 42px;
+  display: grid;
+  place-items: center;
+  padding: 6px 3px 7px;
+  border-radius: 0;
+  background: var(--w-chip) center / 100% 100% no-repeat;
+  box-shadow: none;
+  font-size: clamp(12.5px, 3.6vw, 15px);
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.pp-w-strip .pp-chip input:checked + span {
+  background: var(--w-chip-on) center / 100% 100% no-repeat;
+  box-shadow: none;
+}
+.pp-w-strip .pp-chip input:checked + span::before {
+  content: none;
+}
+.pp-w-strip .pp-chip input:checked + span::after {
+  /* a mark as well as a colour, so the choice never rests on colour alone;
+     tucked in the corner so the word keeps its room */
+  content: '✓';
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  font-size: 11px;
+  line-height: 1;
+}
+.pp-w-strip .pp-chip input:focus-visible + span {
+  outline: 3px solid #fff;
+  outline-offset: 1px;
+}
+.pp-w-strip .pp-hint {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(12px, 3.4vw, 14px);
+  opacity: 0.85;
+}
+
+/* the big stitched button keeps the shape it was drawn with */
+.pp-w-go {
+  appearance: none;
+  box-sizing: border-box;
+  width: min(80%, 320px);
+  aspect-ratio: 720 / 198;
+  padding: 0 4% 1.5%;
+  border: 0;
+  background: var(--w-go) center / 100% 100% no-repeat;
+  filter: drop-shadow(0 4px 4px rgba(40, 50, 15, 0.38));
+  color: var(--charcoal);
+  font: inherit;
+  font-size: clamp(22px, 7vw, 30px);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.pp-w-go:active {
+  transform: translateY(2px);
+}
+.pp-w-go:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* a very narrow phone: two chips a row, so no word is squeezed */
+@media (max-width: 359px) {
+  .pp-w-strip .pp-chips {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -286,6 +286,17 @@ Small calls made while building the plain screens, for Drew to overrule.
 - **The result** keeps the play screen (sign with missed letters marked in red and a doubled dash, snowman, sun) and swaps the keys for a panel a second after the last guess.
 
 
+## Decisions from the welcome screen redo (2026-11-21)
+
+Drew found the names-and-match-length screen flat beside the rest of the game: one big cream card with web-form parts, the title as plain type, nothing overlapping it.
+
+- **Mock-ups first, then build**, as with every look. Round 5 (`art/prompts/round-5-welcome.md`, results in `art/concepts/round-5/`, side by side in `docs/phase-2/welcome-options.jpg`) has three options: A sign-led (the title on the wooden sign), B notepaper and tape (a taped sheet with luggage-tag chips), C scene first (a big snowman, a bunting title and a kraft tray like the keyboard's).
+- **A drawn title is allowed:** the game name may be generated art (melting cut-paper lettering), as the polish notes above already allow for title lettering. Names, the match-length chips, the button and every other word stay live type, with a hidden live heading for screen readers.
+- **Claude ran the generations** in Drew's Chrome on the unlimited model (no credits), with the round 2 play screen as the style reference.
+- Once Drew picks, the pieces he likes are generated again as separate transparent layers (round 6) and the screen is rebuilt in code.
+- **Option A chosen, with four fixes (2026-11-21):** no post may show through or above the sign; the name tags have no brass pins; the yard flowers are a varied mix (snowdrops, primroses, grape hyacinths, tulips, a few crocuses) instead of repeating purple and yellow crocuses; and nothing sits in front of the name tags, so they read as blanks to type in. Three revised mock-ups (A2 stakes, A3 feet, A4 post below) are in `art/concepts/round-5/`.
+- **A3 chosen and built (2026-11-21):** Drew picked A3, the sign on two little feet with snow along its top. Round 6 (`art/prompts/round-6-welcome-layers.md`) generated the pieces as transparent sheets, still in Unlimited mode with no credits, and the screen was rebuilt in code with live type (see `CLAUDE.md`). Calls made while building, for Drew to overrule: the match-length hint ("Keep playing as long as you like.") stays, printed on the kraft strip under the chips; the chosen chip shows a tick as well as turning yellow; on a phone under 360 px wide the chips go two by two; the purple and yellow crocuses baked into the backyard picture are still there behind the new flowers.
+
 ## Decisions from the round 4 review (2026-11-21)
 
 Drew looked at the round 4 art: the lineups, then the live game.

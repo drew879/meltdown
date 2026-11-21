@@ -20,7 +20,7 @@ import {
   type MatchLength,
   type Reduction,
 } from '../engine';
-import { art } from '../paper/art';
+import { art, type Piece } from '../paper/art';
 import { placeYard } from '../paper/yard';
 import { DIFFICULTY_LABELS, matchOverLines } from './copy';
 import { el, type Child } from './dom';
@@ -127,11 +127,24 @@ function layoutWithStage(root: HTMLElement, yard: HTMLImageElement) {
 }
 
 // ---- names and match length ----
+// The welcome screen is built from separate paper pieces (art round 6): the sign
+// holds the only drawn lettering, and every other word is live type laid over a
+// blank tag, tab, strip, chip or button. The flowers stand around the sign and at
+// the edges of the yard, never in front of the fields.
+
+/** A decorative picture: the piece's name is also its class, so welcome.css can place it. */
+const decor = (name: Piece) => el('img', { class: `pp-w-art ${name}`, src: art(name), alt: '', draggable: 'false' });
+
+/** A name tag: a coral tab above a blank cream tag holding the field. */
+function nameTag(label: string, input: HTMLInputElement): HTMLElement {
+  return el('label', { class: 'pp-w-field' }, el('span', { class: 'pp-w-tab' }, label), el('span', { class: 'pp-w-tag' }, input));
+}
 
 export function namesScreen(ctx: ScreenContext): Screen {
   let matchLength: MatchLength = ctx.state.matchLength;
-  const first = el('input', { class: 'pp-input', name: 'first', autocomplete: 'off', autocapitalize: 'words', placeholder: 'Name' });
-  const second = el('input', { class: 'pp-input', name: 'second', autocomplete: 'off', autocapitalize: 'words', placeholder: 'Name' });
+  const field = { class: 'pp-w-input', autocomplete: 'off', autocapitalize: 'words', placeholder: 'Name' };
+  const first = el('input', { ...field, name: 'first' });
+  const second = el('input', { ...field, name: 'second' });
   const problem = errorLine();
   const hints: Record<MatchLength, string> = {
     endless: 'Keep playing as long as you like.',
@@ -153,7 +166,7 @@ export function namesScreen(ctx: ScreenContext): Screen {
   const form = el(
     'form',
     {
-      class: 'pp-form',
+      class: 'pp-w-form',
       novalidate: true,
       onsubmit: (e) => {
         e.preventDefault();
@@ -161,21 +174,44 @@ export function namesScreen(ctx: ScreenContext): Screen {
         if (result.error) problem.show(result.error.message);
       },
     },
-    el('label', { class: 'pp-field' }, el('span', { class: 'pp-label' }, 'First player'), first),
-    el('label', { class: 'pp-field' }, el('span', { class: 'pp-label' }, 'Second player'), second),
-    lengths,
-    hint,
+    el('div', { class: 'pp-w-names' }, nameTag('First player', first), nameTag('Second player', second)),
+    el('div', { class: 'pp-w-strip' }, lengths, hint),
     problem.node,
-    button("Let's play", () => {}, 'main', 'submit'),
+    el('button', { class: 'pp-w-go', type: 'submit' }, "Let's play"),
   );
-  const card = el(
+  const welcome = el(
     'section',
-    { class: 'pp-card' },
-    el('h1', { class: 'pp-title' }, 'Meltdown'),
-    el('p', { class: 'pp-lead' }, 'Guess the word before the snowman melts.'),
+    { class: 'pp-w' },
+    el('h1', { class: 'pp-sr', tabindex: -1 }, 'Meltdown'),
+    el(
+      'div',
+      { class: 'pp-w-signbox', 'aria-hidden': 'true' },
+      decor('snow-1'),
+      decor('hyacinth-1'),
+      decor('snowdrop-2'),
+      el('img', { class: 'pp-w-sign', src: art('welcome-sign'), alt: '', draggable: 'false' }),
+      decor('snow-2'),
+      decor('primrose-1'),
+      decor('tulip-2'),
+    ),
+    el('p', { class: 'pp-w-lead' }, 'Guess the word before the snowman melts.'),
     form,
   );
-  const root = page(ctx, 'names', [stage(), card], false);
+  // the pieces the page cuts into its paper (tag, tab, strip, chips, button) come from art/, so the
+  // stylesheet reads their addresses from here and not from a path of its own
+  const pieces: [string, Piece][] = [
+    ['--w-tag', 'tag-blank'],
+    ['--w-tab', 'tab-coral'],
+    ['--w-strip', 'strip-kraft'],
+    ['--w-chip', 'chip-cream'],
+    ['--w-chip-on', 'chip-yellow'],
+    ['--w-go', 'button-yellow'],
+  ];
+  const stageEl = stage();
+  // flowers at the foot of the fence, on either side of the snowman
+  stageEl.append(decor('snowdrop-1'), decor('primrose-2'), decor('tulip-1'), decor('hyacinth-2'));
+  const root = page(ctx, 'names welcome', [stageEl, welcome], false);
+  for (const [name, piece] of pieces) root.style.setProperty(name, `url(${art(piece)})`);
   return { root, layout: () => layoutWithStage(root, ctx.yard) };
 }
 
