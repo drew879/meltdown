@@ -33,8 +33,9 @@ const SHEETS = [
   { src: 'snowman-6-8.png', order: 'x', join: 14, names: [null, null, 'snowman-8'], hat: true },
   // Round 4 (art/prompts/round-4-stage-3-and-win.md). Stage 3 redrawn between
   // stages 2 and 4: only the middle figure is used, and when the sheet is
-  // there it replaces the stage 3 cut from snowman-3-5.png above.
-  { src: 'snowman-3-redraw.png', order: 'x', join: 14, names: [null, 'snowman-3', null], hat: true },
+  // there it replaces the stage 3 cut from snowman-3-5.png above. join is 10
+  // here: at 12 or more the middle and right puddles run together into one piece.
+  { src: 'snowman-3-redraw.png', order: 'x', join: 10, names: [null, 'snowman-3', null], hat: true },
   // Two win celebrations for Drew to choose from, four poses each, read
   // top left, top right, bottom left, bottom right.
   { src: 'win-backflip.png', order: 'grid', join: 14, names: ['win-backflip-1', 'win-backflip-2', 'win-backflip-3', 'win-backflip-4'], hat: true },
@@ -58,8 +59,21 @@ const SHEETS = [
 
 /** Pixels of hat brim the snowman is scaled to, so every stage shares one scale. */
 const HAT_WIDTH = 190;
-/** Small corrections where a figure came out a touch too tall for its place in the melt. */
-const TWEAK = { 'snowman-6': 0.9 };
+/**
+ * Small corrections where a figure came out a touch too tall for its place in the melt.
+ * snowman-3 (redrawn 2026-11-21): the sheet put a stage 5 on its right, so the
+ * middle figure came out 689 px tall, shorter than stage 4's 729. Scaled up to
+ * 755 it sits evenly between stage 2 (780) and stage 4. The hat grows with it,
+ * to 215 px against 205 and 193 either side. Set it to 1 for the figure as drawn.
+ * Win poses: drawn 6 to 19 percent smaller (by hat area) than the fresh
+ * snowman they replace, so each sheet is scaled up to match stage 0's hat.
+ */
+const TWEAK = {
+  'snowman-3': 1.096,
+  'snowman-6': 0.9,
+  ...Object.fromEntries([1, 2, 3, 4].map((n) => [`win-backflip-${n}`, 1.1])),
+  ...Object.fromEntries([1, 2, 3, 4].map((n) => [`win-dance-${n}`, 1.19])),
+};
 /** The three sign boards came out in slightly different browns; these bring them to one tone. */
 const TONE = { 'sign-2': { brightness: 0.86, saturation: 0.9 }, 'sign-3': { brightness: 0.94 } };
 
@@ -97,11 +111,13 @@ function islands({ data, w, h }, join) {
   }
   const label = new Int32Array(mw * mh);
   const found = [];
+  const specks = new Set(); // islands too small to be a piece; left in any crop they fall in, as before
   const stack = [];
+  let nextId = 0;
   for (let i = 0; i < grown.length; i++) {
     if (!grown[i] || label[i]) continue;
-    const id = found.length + 1;
-    const box = { x0: mw, y0: mh, x1: -1, y1: -1, area: 0 };
+    const id = ++nextId;
+    const box = { id, x0: mw, y0: mh, x1: -1, y1: -1, area: 0 };
     stack.push(i);
     label[i] = id;
     while (stack.length) {
@@ -123,6 +139,7 @@ function islands({ data, w, h }, join) {
       }
     }
     if (box.area * S * S > 900) found.push(box);
+    else specks.add(id);
   }
   const pad = 6;
   return found.map((b) => {
@@ -133,8 +150,33 @@ function islands({ data, w, h }, join) {
       y,
       w: Math.min(w, (b.x1 + 1) * S + pad) - x,
       h: Math.min(h, (b.y1 + 1) * S + pad) - y,
+      // which island this is and who owns each quarter-size cell, so a crop can drop a neighbour's pixels
+      owner: { id: b.id, label, mw, S, specks },
     };
   });
+}
+
+/**
+ * A piece is cropped as a rectangle, so the tip of a neighbouring figure's
+ * arm can poke into it when two figures sit close together. Clear every pixel
+ * in the crop that belongs to some other island. Returns how many it cleared.
+ */
+function clearNeighbours(px, box) {
+  const { id, label, mw, S, specks } = box.owner;
+  let cleared = 0;
+  for (let cy = 0; cy < box.h; cy++) {
+    const row = Math.floor((box.y + cy) / S) * mw;
+    for (let cx = 0; cx < box.w; cx++) {
+      const who = label[row + Math.floor((box.x + cx) / S)];
+      if (who === 0 || who === id || specks.has(who)) continue;
+      const i = (cy * box.w + cx) * 4;
+      if (px[i + 3] > 0) {
+        px[i + 3] = 0;
+        cleared++;
+      }
+    }
+  }
+  return cleared;
 }
 
 function sortBoxes(boxes, order) {
@@ -256,12 +298,16 @@ for (const sheet of SHEETS) {
     else if (sheet.maxSide) scale = Math.min(1, sheet.maxSide / Math.max(box.w, box.h));
     const outW = Math.max(1, Math.round(box.w * scale));
     const outH = Math.max(1, Math.round(box.h * scale));
-    let piece = sharp(file).extract({ left: box.x, top: box.y, width: box.w, height: box.h });
-    if (sheet.unnail) {
-      const { data, info } = await piece.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-      console.log(`    removed ${removeNails(data, info.width, info.height)} nail heads`);
-      piece = sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } });
-    }
+    const crop = { left: box.x, top: box.y, width: box.w, height: box.h };
+    let piece = sharp(file).extract(crop);
+    // Look at the crop's pixels: drop any neighbour's pixels, paint out nails.
+    // A piece is only rebuilt from them when something changed, so pieces that
+    // need neither stay byte for byte as before.
+    const { data, info } = await sharp(file).extract(crop).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    const cleared = clearNeighbours(data, box);
+    if (cleared) console.log(`    cleared ${cleared} pixels that belong to the next piece`);
+    if (sheet.unnail) console.log(`    removed ${removeNails(data, info.width, info.height)} nail heads`);
+    if (cleared || sheet.unnail) piece = sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } });
     if (TONE[name]) piece = piece.modulate(TONE[name]);
     await piece
       .resize(outW, outH, { kernel: 'lanczos3' })
