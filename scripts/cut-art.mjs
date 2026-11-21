@@ -36,6 +36,10 @@ const SHEETS = [
   // there it replaces the stage 3 cut from snowman-3-5.png above. join is 10
   // here: at 12 or more the middle and right puddles run together into one piece.
   { src: 'snowman-3-redraw.png', order: 'x', join: 10, names: [null, 'snowman-3', null], hat: true },
+  // Round 4b (art/prompts/round-4b-stage-4-redraw.md). Stage 4 redrawn so it no
+  // longer looks like the new stage 3: only the middle figure is used, and when
+  // the sheet is there it replaces the stage 4 cut from snowman-4-5-fix.png above.
+  { src: 'snowman-4-redraw.png', order: 'x', join: 10, names: [null, 'snowman-4', null], hat: true },
   // The win celebration: four backflip poses, read top left, top right,
   // bottom left, bottom right. Drew chose the backflip over the dance on
   // 2026-11-21; win-dance.png stays in art/layers/originals/ but is not cut.

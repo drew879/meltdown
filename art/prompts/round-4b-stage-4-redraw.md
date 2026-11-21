@@ -37,3 +37,12 @@ Then:
 2. `npm run art`: `git status` should show only the sheet, `public/art/snowman-4.webp` and the manifest changed.
 3. Size check, which is what went wrong last time. The cutter scales a sheet by its widest hat row, so a hat that sits straight reads wider than a tilted one and the whole sheet is cut too small. Compare the stages by hat area and height with `node scripts/lineup.mjs docs/phase-2/stage-3-4-redraw.png snowman-2 snowman-3 snowman-4 snowman-5`. Stage 4 should come out at about 640 px tall (stage 3 is 755, stage 5 is 528, so the steps are about equal) with its hat the same size as its neighbours'; correct it with `TWEAK`, with a comment saying why.
 4. Look at stages 3, 4 and 5 in the game on Easy (8 misses allowed): `?a=Polar%20Bear&c=Animal&limit=8&g=QXZ`, `QXZJ` and `QXZJK` (3, 4 and 5 misses). Read every picture before showing Drew.
+
+## Result (2026-11-21)
+
+Run by Claude in Drew's Chrome with the prompt above unchanged, both references uploaded from `art/layers/originals/`, GPT Image 2.6 Sunburst on Unlimited (no credits). Three versions were generated and the second was kept as `snowman-4-redraw.png`.
+
+- All three cut into 3 pieces at `join: 10`.
+- Version 1's middle figure came out at 584 px tall with a hat a little small (area 13,400): a big drop after stage 3 (755) and a small one before stage 5 (528). Version 3 was like version 2, with the left and middle puddles almost touching. Neither is kept.
+- Version 2 needs no `TWEAK`: stage 4 is 639 px tall (stages 3 and 5 are 755 and 528, so the steps are 116 and 111), its hat's area is 14,440 against stage 3's 14,300, and the snow is 505 px across between 480 and 521.
+- Lineup of stages 2 to 6: `docs/phase-2/stage-4-redraw.png`. In the game on Easy at 3, 4 and 5 misses: `docs/phase-2/stage-3-4-5-in-game.png`.
