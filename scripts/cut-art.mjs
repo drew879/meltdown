@@ -55,6 +55,28 @@ const SHEETS = [
       null, 'grass-2', null, 'grass-4',
     ],
   },
+  // Round 6 (art/prompts/round-6-welcome-layers.md): the welcome screen's pieces,
+  // stacked top to bottom: the sign on its feet with MELTDOWN, a blank cream tag,
+  // the coral label tab, the kraft strip, a cream chip, a yellow chip and the
+  // stitched button. Everything but the sign is blank, so the words are live type.
+  // maxSides gives each piece its own size cap.
+  {
+    src: 'welcome-ui.png',
+    order: 'y',
+    join: 12,
+    maxSide: 960,
+    maxSides: { 'tag-blank': 640, 'tab-coral': 320, 'strip-kraft': 720, 'chip-cream': 320, 'chip-yellow': 320, 'button-yellow': 720 },
+    names: ['welcome-sign', 'tag-blank', 'tab-coral', 'strip-kraft', 'chip-cream', 'chip-yellow', 'button-yellow'],
+  },
+  // The spring flowers, two rows of four: snowdrops, pink primroses, then blue
+  // grape hyacinths and orange tulips. They stand beside the crocuses.
+  {
+    src: 'flowers.png',
+    order: 'grid',
+    join: 20,
+    maxSide: 260,
+    names: ['snowdrop-1', 'snowdrop-2', 'primrose-1', 'primrose-2', 'hyacinth-1', 'hyacinth-2', 'tulip-1', 'tulip-2'],
+  },
 ];
 
 /** Pixels of hat brim the snowman is scaled to, so every stage shares one scale. */
@@ -298,7 +320,7 @@ for (const sheet of SHEETS) {
     if (listOnly || !name) continue;
     let scale = 1;
     if (sheet.hat && sheetHat > 40) scale = (HAT_WIDTH / sheetHat) * (TWEAK[name] ?? 1);
-    else if (sheet.maxSide) scale = Math.min(1, sheet.maxSide / Math.max(box.w, box.h));
+    else if (sheet.maxSide) scale = Math.min(1, (sheet.maxSides?.[name] ?? sheet.maxSide) / Math.max(box.w, box.h));
     const outW = Math.max(1, Math.round(box.w * scale));
     const outH = Math.max(1, Math.round(box.h * scale));
     const crop = { left: box.x, top: box.y, width: box.w, height: box.h };
