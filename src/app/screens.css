@@ -1,0 +1,485 @@
+/* The plain screens between rounds, and what every screen shares: the New game
+   button, the calm notices and the confirmation. All of it is made from the
+   same paper pieces as the play screen. */
+
+.pp [hidden] {
+  display: none !important;
+}
+
+/* ---- the shell ---- */
+.pp-screens {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.pp-screen {
+  position: absolute;
+  inset: 0;
+}
+.pp-screen.play {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+.pp-lower {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+.pp-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- the New game button, between the name tags ---- */
+.pp-menu {
+  appearance: none;
+  position: relative;
+  flex: none;
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 5px 11px 4px;
+  border: 0;
+  border-radius: 99px;
+  background: var(--cream) var(--grain);
+  box-shadow: var(--lift);
+  color: var(--charcoal);
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.pp-menu::after {
+  /* a bigger area to tap than the paper shows */
+  content: '';
+  position: absolute;
+  inset: -8px -6px;
+}
+.pp-menu:active {
+  transform: translateY(1px);
+}
+.pp-menu:focus-visible,
+.pp-btn:focus-visible,
+.pp-toggle:focus-visible,
+.pp-notice-ok:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ---- buttons ---- */
+.pp-btn {
+  appearance: none;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 22px 10px;
+  border: 0;
+  border-radius: 12px 14px 11px 15px;
+  background: var(--sun) var(--grain);
+  box-shadow: var(--lift);
+  color: var(--charcoal);
+  font: inherit;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.pp-btn.alt {
+  background-color: var(--kraft);
+  font-size: 16px;
+  padding: 10px 18px 8px;
+}
+.pp-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(70, 50, 20, 0.3);
+}
+.pp-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* ---- pages: setup, handoff and the rest ---- */
+.pp-screen.page {
+  display: flex;
+  flex-direction: column;
+}
+.pp-screen.page .pp-tags {
+  flex: none;
+}
+.pp-scroll {
+  position: relative;
+  z-index: 2;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(env(safe-area-inset-top, 0px) + 6px) calc(env(safe-area-inset-right, 0px) + 12px)
+    calc(env(safe-area-inset-bottom, 0px) + 18px) calc(env(safe-area-inset-left, 0px) + 12px);
+}
+.pp-screen.page .pp-tags + .pp-scroll {
+  padding-top: calc(24px + var(--notice-h, 0px));
+}
+
+/* the snowman and sun standing in the yard */
+.pp-stage {
+  position: relative;
+  flex: none;
+  width: 100%;
+  max-width: 520px;
+  height: clamp(96px, 26vh, 250px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.pp-hero-snowman {
+  height: 100%;
+  width: auto;
+  max-width: none;
+  filter: drop-shadow(0 5px 4px rgba(40, 50, 15, 0.38));
+  transform-origin: 50% 100%;
+  animation: pp-boil 1.3s steps(2, jump-none) infinite;
+}
+.pp-hero-sun {
+  position: absolute;
+  left: 2%;
+  top: 0;
+  width: clamp(60px, 15vh, 130px);
+  max-width: none;
+  filter: drop-shadow(0 4px 4px rgba(30, 70, 90, 0.35));
+  animation: pp-pulse 1.9s steps(3, jump-none) infinite;
+}
+
+/* the paper card holding the words and fields */
+.pp-card {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 480px;
+  margin: 12px auto 0;
+  padding: 18px 16px 18px;
+  border-radius: 16px 19px 17px 20px / 19px 16px 20px 17px;
+  background: var(--cream) var(--grain);
+  box-shadow: var(--lift);
+  transform: rotate(-0.4deg);
+  user-select: text;
+  -webkit-user-select: text;
+}
+.pp-title {
+  margin: 0;
+  font-size: 40px;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 3px 0 var(--sun);
+}
+.pp-heading {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.15;
+}
+.pp-heading.big {
+  font-size: 34px;
+  text-align: center;
+}
+.pp-lead {
+  margin: 6px 0 14px;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+.pp-title + .pp-lead {
+  text-align: center;
+}
+.pp-heading.big + .pp-lead {
+  text-align: center;
+}
+.pp-level {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 9px 11px 8px 12px;
+  background: #fffaf0;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+.pp-level b {
+  font-weight: 900;
+}
+
+/* ---- forms ---- */
+.pp-form {
+  display: grid;
+  gap: 14px;
+}
+.pp-field {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.pp-label,
+.pp-field legend {
+  padding: 0;
+  font-size: 13px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+.pp-input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 10px 12px 9px 13px;
+  background: #fffaf0;
+  box-shadow: 0 2px 4px rgba(60, 40, 10, 0.35) inset, 0 1px 0 rgba(255, 255, 255, 0.7);
+  color: var(--charcoal);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  /* the page turns text selection off; fields on iPhone need it back */
+  user-select: text;
+  -webkit-user-select: text;
+}
+.pp-input::placeholder {
+  color: rgba(58, 53, 49, 0.45);
+}
+.pp-input:focus-visible {
+  outline: 3px solid var(--sun);
+  outline-offset: 2px;
+}
+.pp-input.hide {
+  -webkit-text-security: disc;
+}
+.pp-secretrow {
+  display: flex;
+  gap: 8px;
+}
+.pp-toggle {
+  appearance: none;
+  flex: none;
+  min-width: 68px;
+  height: 48px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px 12px 9px 13px;
+  background: var(--kraft) var(--grain);
+  box-shadow: var(--lift);
+  color: var(--charcoal);
+  font: inherit;
+  font-size: 15px;
+  text-transform: uppercase;
+}
+.pp-under {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.pp-hint,
+.pp-count {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  opacity: 0.8;
+}
+.pp-count {
+  flex: none;
+}
+.pp-count.over {
+  color: #a8301a;
+  opacity: 1;
+}
+.pp-error {
+  margin: 0;
+  padding: 9px 12px 8px;
+  border-radius: 9px 11px 8px 12px;
+  background: #f8d9cf;
+  box-shadow: inset 0 0 0 2px #c4472f;
+  color: #7a2414;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+/* chips: paper tabs that work as radio buttons */
+.pp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pp-chip {
+  position: relative;
+  cursor: pointer;
+}
+.pp-chip span {
+  display: block;
+  padding: 9px 13px 8px;
+  border-radius: 9px 11px 8px 12px;
+  background: #fffaf0 var(--grain);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 2px 0 rgba(70, 50, 20, 0.28), 0 3px 3px rgba(60, 40, 10, 0.22);
+  font-size: 15px;
+  line-height: 1.15;
+  text-align: center;
+}
+.pp-chip small {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.75;
+}
+.pp-chip input:checked + span {
+  background-color: var(--sun);
+  box-shadow: 0 0 0 2.5px var(--charcoal) inset, 0 2px 0 rgba(70, 50, 20, 0.28), 0 3px 3px rgba(60, 40, 10, 0.22);
+}
+.pp-chip input:checked + span::before {
+  /* a mark as well as a colour, so the choice never rests on colour alone */
+  content: '✓ ';
+}
+.pp-chip input:focus-visible + span {
+  outline: 3px solid var(--charcoal);
+  outline-offset: 2px;
+}
+.pp-field.three .pp-chip {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* ---- the answer to a round: the panel that takes the keyboard's place ---- */
+.pp-result {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
+  width: calc(100% - 16px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+  max-width: 620px;
+  justify-self: center;
+  margin: 16px 0 calc(env(safe-area-inset-bottom, 0px) + 10px);
+  padding: 12px 16px 14px;
+  border-radius: 20px 24px 22px 19px / 22px 19px 24px 20px;
+  background: var(--kraft) var(--grain);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 3px 0 var(--kraft-dark), 0 8px 10px rgba(40, 45, 10, 0.4);
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  text-align: center;
+}
+.pp-headline {
+  margin: 0;
+  font-size: clamp(22px, 7vw, 30px);
+  line-height: 1.05;
+  letter-spacing: 0.03em;
+  color: var(--cream);
+  text-shadow: 0 2px 0 rgba(90, 60, 25, 0.7), 0 3px 4px rgba(60, 40, 10, 0.4);
+}
+.pp-note {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+/* ---- calm notices ---- */
+.pp-notices {
+  position: absolute;
+  z-index: 6;
+  left: 0;
+  right: 0;
+  top: calc(env(safe-area-inset-top, 0px) + 64px);
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  pointer-events: none;
+}
+.pp-notice {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 400px;
+  padding: 8px 8px 8px 14px;
+  border-radius: 12px;
+  background: var(--cream) var(--grain);
+  box-shadow: var(--lift);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  pointer-events: auto;
+}
+.pp-notice-ok {
+  appearance: none;
+  flex: none;
+  padding: 6px 12px 5px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--sun) var(--grain);
+  box-shadow: var(--lift);
+  color: var(--charcoal);
+  font: inherit;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+/* ---- the confirmation ---- */
+.pp-scrim {
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(35, 30, 20, 0.55);
+}
+.pp-dialog {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 360px;
+  padding: 20px 18px 18px;
+  border-radius: 16px 19px 17px 20px / 19px 16px 20px 17px;
+  background: var(--cream) var(--grain);
+  box-shadow: var(--lift), 0 14px 30px rgba(20, 20, 5, 0.45);
+  text-align: center;
+}
+
+/* ---- the smallest phones (320 px): slimmer tags, so short names still fit whole ---- */
+@media (max-width: 360px) {
+  .pp-tags {
+    gap: 6px;
+    padding-left: calc(env(safe-area-inset-left, 0px) + 10px);
+    padding-right: calc(env(safe-area-inset-right, 0px) + 10px);
+  }
+  .pp-tag {
+    gap: 5px;
+    padding: 5px 9px 4px 21px;
+    font-size: 15px;
+  }
+  .pp-tag::before {
+    left: 6px;
+    width: 9px;
+    height: 9px;
+    margin-top: -4.5px;
+  }
+  .pp-tag small {
+    left: 18px;
+    font-size: 9px;
+  }
+  .pp-menu {
+    padding: 5px 8px 4px;
+    font-size: 9.5px;
+    letter-spacing: 0.04em;
+  }
+}

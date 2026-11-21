@@ -10,28 +10,9 @@
     <style>
       html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; background: #7f8531; }
     </style>
-    <script type="module" src="./src/paper/play.ts"></script>
+    <script type="module" src="./src/app/main.ts"></script>
   </head>
   <body>
-    <main class="pp" id="pp">
-      <img class="pp-yard" id="yard" alt="" />
-      <header class="pp-tags">
-        <div class="pp-tag turn"><span class="pp-name">Sam</span><span aria-label="2 points">2</span><small>guessing</small></div>
-        <div class="pp-tag"><span class="pp-name">Dad</span><span aria-label="1 point">1</span></div>
-      </header>
-      <section class="pp-scene" id="scene">
-        <img class="pp-sun" id="sun" alt="" />
-        <div class="pp-thermo" id="thermo" aria-hidden="true"><div class="pp-mercury" id="mercury"></div></div>
-        <img class="pp-snowman" id="snowman" alt="" />
-        <button class="pp-again" id="again" hidden>Play again</button>
-      </section>
-      <section class="pp-sign" id="sign" aria-label="The answer">
-        <div class="pp-signbox" id="signbox">
-          <div class="pp-board" id="board"><div class="pp-answer" id="answer" role="img"></div></div>
-          <div class="pp-category" id="category"></div>
-        </div>
-      </section>
-      <div class="pp-tray" id="tray" aria-label="Letters"></div>
-    </main>
+    <main class="pp" id="pp"></main>
   </body>
 </html>

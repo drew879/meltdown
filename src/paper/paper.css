@@ -20,8 +20,6 @@
 
   position: fixed;
   inset: 0;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
   overflow: hidden;
   background: var(--grass);
   color: var(--charcoal);
@@ -61,7 +59,8 @@
   align-items: baseline;
   gap: 8px;
   min-width: 0;
-  max-width: 46%;
+  flex: 0 1 auto;
+  max-width: 44%;
   padding: 5px 12px 4px 26px;
   border-radius: 7px 9px 8px 6px / 8px 6px 9px 7px;
   background: var(--cream) var(--grain);
@@ -210,7 +209,11 @@
   position: absolute;
   z-index: 3;
   left: 50%;
-  top: -17px;
+  bottom: calc(100% - 17px);
+  width: max-content;
+  max-width: 88vw;
+  box-sizing: border-box;
+  text-align: center;
   padding: 4px 16px 3px;
   border-radius: 7px 8px 6px 9px;
   background: var(--coral) var(--grain);
@@ -218,8 +221,12 @@
   font-size: 15px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
-  white-space: nowrap;
   transform: translateX(-50%) rotate(-1deg);
+}
+.pp-category.long {
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
 }
 
 /* the post, and the flowers, snow and grass at the foot of the sign */
@@ -323,6 +330,11 @@
 .pp-slot.missed {
   color: #ffa78f;
 }
+.pp-slot.missed::after {
+  /* a missed letter also gets a doubled dash, so it is not marked by colour alone */
+  height: max(5px, calc(var(--slot) * 0.2));
+  background: linear-gradient(currentColor 0 35%, transparent 35% 65%, currentColor 65%);
+}
 .pp-slot.pop {
   animation: pp-pop 0.34s steps(4) both;
 }
@@ -394,29 +406,6 @@
   transform: translateY(2px);
 }
 
-/* the round is over */
-.pp-again {
-  position: absolute;
-  z-index: 4;
-  left: 50%;
-  top: 2px;
-  transform: translateX(-50%) rotate(-2deg);
-  white-space: nowrap;
-  padding: 9px 22px 7px;
-  border: 0;
-  border-radius: 12px 14px 11px 15px;
-  background: var(--sun) var(--grain);
-  box-shadow: var(--lift);
-  color: var(--charcoal);
-  font: inherit;
-  font-size: 20px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.pp-again[hidden] {
-  display: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .pp-slot.pop {
     animation: none;
@@ -454,7 +443,9 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .pp-snowman,
-  .pp-sun {
+  .pp-sun,
+  .pp-hero-snowman,
+  .pp-hero-sun {
     animation: none;
   }
 }
