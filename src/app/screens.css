@@ -161,6 +161,12 @@
 }
 
 /* the paper card holding the words and fields */
+.pp-card,
+.pp-result,
+.pp-dialog {
+  /* a 24-letter name has nowhere to break, so let it break anywhere rather than run off the card */
+  overflow-wrap: anywhere;
+}
 .pp-card {
   box-sizing: border-box;
   width: 100%;

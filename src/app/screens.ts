@@ -201,7 +201,7 @@ export function setupScreen(ctx: ScreenContext): Screen {
   answer.value = draft.answer;
   const count = el('span', { class: 'pp-count', id: 'answer-count' });
   const updateCount = () => {
-    const n = charLength(answer.value.trim());
+    const n = charLength(answer.value.replace(/\s+/g, ' ').trim()); // as the engine counts it
     count.textContent = `${n} of ${ANSWER_MAX_LENGTH}`;
     count.classList.toggle('over', n > ANSWER_MAX_LENGTH);
   };

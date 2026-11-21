@@ -58,12 +58,16 @@ async function fits(p, what, { playScreen = false } = {}) {
   const r = await p.page.evaluate(() => ({
     sideways: document.documentElement.scrollWidth > innerWidth || document.body.scrollWidth > innerWidth,
     tall: document.documentElement.scrollHeight > innerHeight,
+    spilling: [...document.querySelectorAll('.pp-card *, .pp-result *, .pp-dialog *')].filter(
+      (n) => n.scrollWidth > n.clientWidth + 1 && getComputedStyle(n).overflowX === 'visible' && !n.matches('input'),
+    ).length,
     overflowing: [...document.querySelectorAll('.pp-card, .pp-tray, .pp-result, .pp-tags, .pp-board, .pp-dialog')].filter((n) => {
       const b = n.getBoundingClientRect();
       return b.right > innerWidth + 1 || b.left < -1;
     }).length,
   }));
   p.say(!r.sideways, `${what}: the page scrolls sideways`);
+  p.say(r.spilling === 0, `${what}: text spills out of its card (${r.spilling} element(s))`);
   p.say(r.overflowing === 0, `${what}: ${r.overflowing} piece(s) run off the side of the screen`);
   if (playScreen) p.say(!r.tall, `${what}: the play screen scrolls`);
 }
@@ -272,6 +276,28 @@ for (const [w, h] of SIZES) {
     await page.getByRole('button', { name: 'Rematch' }).click();
     say((await text(page)).includes('Dad, type a secret.'), 'a rematch should start with the first player');
     say((await tags(page))[0].startsWith('DAD 0') && (await tags(page))[1].startsWith('SAM 0'), 'a rematch should reset the score');
+    await p.context.close();
+  }
+
+  // ===== the longest names: they must fit on every screen =====
+  {
+    const p = await newPhone(w, h, 'long names');
+    const { page, say } = p;
+    const dad = 'Wolfeschlegelsteinhaus'; // 22 letters with nowhere to break
+    const sam = 'Bartholomew Montgomery Jr'.slice(0, 24);
+    await enterNames(p, dad, sam);
+    await fits(p, 'setup with long names');
+    await setSecret(p, { answer: 'Moon', category: 'Place' });
+    say((await text(page)).includes(`Pass the phone to ${sam}`), 'the handoff should show the whole long name');
+    await fits(p, 'handoff with long names');
+    await p.shot('12-long-names-handoff');
+    await page.getByRole('button', { name: "It's me" }).click();
+    await fits(p, 'play with long names', { playScreen: true });
+    await guessAll(p, ['M', 'O', 'N']);
+    await fits(p, 'result with long names', { playScreen: true });
+    await p.shot('13-long-names-result');
+    await page.locator('.pp-menu').click();
+    await fits(p, 'confirmation with long names');
     await p.context.close();
   }
 
