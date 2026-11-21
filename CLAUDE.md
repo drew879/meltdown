@@ -6,7 +6,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 
 **Every session ends by updating "Where things stand" below**, so the next session, on any model, can pick up without the conversation.
 
-## Where things stand (updated 2026-11-20)
+## Where things stand (updated 2026-11-21)
 
 **The game goes live from `dev`.** Every push to `dev` publishes to https://drew879.github.io/meltdown/ (decided 2026-11-20; see `BRIEF.md`). Drew changed the Pages settings on 2026-11-20 so `dev` can publish. Cloud sessions cannot re-run or start the workflow by hand (the Claude GitHub App gets a 403), so redeploy by pushing to `dev`.
 
@@ -16,7 +16,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 
 **Now: art round 4, which Drew is running** (agreed 2026-11-20). Prompts in `art/prompts/round-4-stage-3-and-win.md`: melt stage 3 redrawn (keeping the waving arm), and two win-celebration options (a backflip, a little dance) for Drew to pick from, plus an optional cloud and snowflakes. When he says they are done, collect them through the Higgsfield connector (`show_generations`) or ask him for the files, save them in `art/layers/originals/`, add them to `SHEETS` in `scripts/cut-art.mjs` (stage 3 is the middle figure of its sheet), run `npm run art`, and show him a lineup of stages 2 to 4.
 
-**Next: Step 2, make it playable.** Agreed with Drew on 2026-11-20. He asked for the art round first; confirm whether Step 2 can run alongside it before starting.
+**In progress: Step 2, make it playable.** Drew asked on 2026-11-21 for it to run in a separate cloud session, alongside art round 4. While both run, they split the files: the Step 2 session owns `index.html`, `src/` (except `src/paper/art-manifest.json`), `scripts/check-*.mjs` and the tests; the art round owns `art/`, `public/art/`, `src/paper/art-manifest.json` and `scripts/cut-art.mjs`. Both push to `dev`, so fetch and merge `origin/dev` before every push, and push only builds that work, because each push goes live.
 
 - One app page that shows the screen for `state.phase`, driven by `reduce` in `src/engine/flow.ts`, saving after every action with `createSaveStore`.
 - The play screen reads the engine's round instead of its own stand-in rules, with real names and scores.
@@ -26,7 +26,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 
 **Still open from Phase 1** (none of it blocks Step 2)
 
-- Drew's sign change (2026-11-20): the nail heads at the board's ends looked odd with nothing behind them. Done: `scripts/cut-art.mjs` paints them out. Asked him whether the category tag's two nails, which sit just above the board's top edge, should come down onto the wood.
+- Drew's sign change, done: the nail heads at the board's ends looked odd with nothing behind them, so `scripts/cut-art.mjs` paints them out (2026-11-20). The category tag's two nails, which sat above the board's top edge, are gone too (2026-11-21).
 - Approval of Phase 1.
 - First real-phone look (2026-11-20): the live page loads and looks good on Drew's iPhone.
 - **Melt stage 3 runs backwards** (being redrawn in round 4). Drew saw the snowman get taller going into the arm-lift pose. Stage 3 came from a different sheet (`snowman-3-5.png`): its hat sits above stage 2's (786 vs 780 px), and it is slimmer and more upright with a waving arm. Shrinking it to 94% fixes the height but leaves a smaller hat and a slimmer body, so 3 to 4 then looks like widening; see `docs/phase-1/11-melt-stage-3.jpg`. Drew chose a redraw (not the shrink), in the same round as the win poses.
