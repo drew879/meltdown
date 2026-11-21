@@ -62,7 +62,7 @@ export interface Particle {
   piece: 'heat-1' | 'heat-2' | 'drop';
   x: number;
   y: number;
-  /** how wide it is drawn */
+  /** how tall it is drawn (its width follows from the picture, so a piece drawn thinner or fatter stays the same height) */
   size: number;
   rot: number;
   opacity: number;
@@ -195,7 +195,7 @@ export function missFrame(from: number, to: number, t: number): MeltFrame {
       piece: i === 1 ? 'heat-2' : 'heat-1',
       x: beside ? [-0.36, 0.38][i]! * Math.max(0.75 * FULL, h) : -0.12 * FULL,
       y: (beside ? h * 0.4 : h + 0.02 * FULL) + 0.3 * FULL * p,
-      size: 0.15 * FULL,
+      size: 0.24 * FULL,
       rot: 0,
       opacity: p < 0.2 ? 0.6 : p > 0.8 ? 0.5 : 1,
       behind: true,
@@ -204,7 +204,7 @@ export function missFrame(from: number, to: number, t: number): MeltFrame {
   // two drops of sweat fly off his head as he settles
   const head = stageHeight(to) * 0.82;
   for (const side of [-1, 1]) {
-    const drop = thrown(t, settled, SWEAT_MS, { x0: 0.12 * FULL * side, y0: head, vx: 0.42 * FULL * side, vy: 0.8 * FULL, size: 0.085 * FULL, spin: 140 * side });
+    const drop = thrown(t, settled, SWEAT_MS, { x0: 0.12 * FULL * side, y0: head, vx: 0.42 * FULL * side, vy: 0.8 * FULL, size: 0.11 * FULL, spin: 140 * side });
     if (drop) f.particles.push(drop);
   }
   return f;
@@ -246,7 +246,7 @@ function splash(f: MeltFrame, t: number, at: number, n: number, spread: number, 
       y0: 0.05 * FULL,
       vx: a * 0.55 * FULL * spread,
       vy: (0.9 + 0.45 * (1 - Math.abs(a))) * FULL * power,
-      size: (0.06 + 0.02 * (i % 2)) * FULL,
+      size: (0.078 + 0.026 * (i % 2)) * FULL,
       spin: a * 160,
     });
     if (drop) f.particles.push(drop);

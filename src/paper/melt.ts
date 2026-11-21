@@ -182,8 +182,8 @@ export function createMelt(scene: HTMLElement, snowman: HTMLImageElement, sun: H
         bit.dataset.piece = p.piece;
         bit.src = piece.src;
       }
-      const w = p.size * k;
-      const h = (w * piece.h) / piece.w;
+      const h = p.size * k;
+      const w = (h * piece.w) / piece.h;
       bit.style.width = `${w}px`;
       bit.style.height = `${h}px`;
       bit.style.opacity = String(p.opacity);
