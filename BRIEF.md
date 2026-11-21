@@ -285,3 +285,11 @@ Small calls made while building the plain screens, for Drew to overrule.
 - **Category** has no default: the setter must pick one. Difficulty starts on the setter's last choice.
 - **The result** keeps the play screen (sign with missed letters marked in red and a doubled dash, snowman, sun) and swaps the keys for a panel a second after the last guess.
 
+
+## Decisions from the round 4 review (2026-11-21)
+
+Drew looked at the round 4 art: the lineups, then the live game.
+
+- **The new stage 3 fixes the melt order**, but stages 3 and 4 look very similar (same face, body and scarf; only the raised arm and a sweat bead differ). Swapping them or shrinking stage 4 was shown (`docs/phase-2/stage-3-4-options.png`) and not chosen.
+- **Stage 4 is redrawn** as a clearly more melted figure between the new stage 3 and stage 5 (round 4b, `art/prompts/round-4b-stage-4-redraw.md`). **Claude runs it with computer use in Drew's Chrome, but only after Drew says he is done with his computer.** Nothing in the game changes until the new stage 4 is cut and approved.
+- **Backflip or dance, and the cloud and snow:** Drew asked to see them in action before choosing. A preview page plays them in the real yard (`celebrate.html`, live on the site). Still undecided; the page is a throwaway mock-up.
