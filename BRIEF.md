@@ -273,3 +273,14 @@ Drew wanted a live version to play and iterate on sooner. These take precedence 
 - **Win celebration:** two options are generated in the same round, a backflip and a little dance, four stop-motion poses each. Drew picks one.
 - **The sign** has no nail heads at its ends, since nothing behind them would hold a nail. The cutting script paints them out.
 - **Drew runs the generations himself** on higgsfield.ai, from the prompts in `art/prompts/round-4-stage-3-and-win.md`.
+
+## Decisions from Step 2, making it playable (2026-11-21)
+
+Small calls made while building the plain screens, for Drew to overrule.
+
+- **Copy** is short sentences: "Dad, type a secret.", "Pass the phone to Sam.", "It's me", "YOU GOT IT!", "No point this time.", "Sam wins!". The win heading is new; the loss headings are the seven chosen on 2026-11-19, picked by round so a refresh keeps the same one.
+- **New game** is a small button between the name tags on every screen once a game has started, always with a confirmation. The names screen has none, since there is nothing to clear.
+- **The handoff screen's way back** ("Change the answer") returns to setup with the typed answer kept but hidden, so the guesser does not see it by accident. The half-typed draft is never saved; the answer is saved once the setter taps Done, so a refresh on the handoff resumes there.
+- **Category** has no default: the setter must pick one. Difficulty starts on the setter's last choice.
+- **The result** keeps the play screen (sign with missed letters marked in red and a doubled dash, snowman, sun) and swaps the keys for a panel a second after the last guess.
+

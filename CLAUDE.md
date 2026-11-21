@@ -6,23 +6,25 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 
 **Every session ends by updating "Where things stand" below**, so the next session, on any model, can pick up without the conversation.
 
-## Where things stand (updated 2026-11-21)
+## Where things stand (updated 2026-11-21, end of Step 2)
 
 **The game goes live from `dev`.** Every push to `dev` publishes to https://drew879.github.io/meltdown/ (decided 2026-11-20; see `BRIEF.md`). Drew changed the Pages settings on 2026-11-20 so `dev` can publish. Cloud sessions cannot re-run or start the workflow by hand (the Claude GitHub App gets a 403), so redeploy by pushing to `dev`.
 
-- Live now: the Phase 1 stand-in round is the front page (`index.html`, code in `src/paper/play.ts`). The answer comes from the URL and the names and scores are fixed, so it is not a playable game yet.
+- Live now (once the Step 2 push deploys): the whole game, playable on one phone. Names and match length, setup, handoff, play, result and match over, all driven by the engine and saved after every action. Nothing has been on a real phone yet except the earlier stand-in screen. The demo link `?a=Polar Bear&c=Animal&limit=6&g=ARE` still shows a round without saving (built with the real engine).
 - The answer limit is 45 characters (engine, sign and checks). At the limit, letters are 22 px at Drew's phone size (440x956).
 - The four engine calls are confirmed (`BRIEF.md`, 2026-11-20).
 
 **Now: art round 4, which Drew is running** (agreed 2026-11-20). Prompts in `art/prompts/round-4-stage-3-and-win.md`: melt stage 3 redrawn (keeping the waving arm), and two win-celebration options (a backflip, a little dance) for Drew to pick from, plus an optional cloud and snowflakes. Drew saves his picks in `art/layers/originals/` as `snowman-3-redraw.png`, `win-backflip.png`, `win-dance.png` and `win-sky.png`, which are already in `SHEETS` in `scripts/cut-art.mjs` (the redraw replaces stage 3 when present). He may cut and push them himself from the Mac. Then show him a lineup of stages 2 to 4 and the two celebrations side by side.
 
-**In progress: Step 2, make it playable.** Drew asked on 2026-11-21 for it to run in a separate cloud session, alongside art round 4. While both run, they split the files: the Step 2 session owns `index.html`, `src/` (except `src/paper/art-manifest.json`), `scripts/check-*.mjs` and the tests; the art round owns `art/`, `public/art/`, `src/paper/art-manifest.json` and `scripts/cut-art.mjs`. Both push to `dev`, so fetch and merge `origin/dev` before every push, and push only builds that work, because each push goes live.
+**Step 2, make it playable: built and pushed to `dev` on 2026-11-21; waiting for Drew to play it on his phone.** It ran in its own cloud session alongside art round 4. While both ran they split the files (this session: `index.html`, `src/` except the manifest, `scripts/check-*.mjs`, tests; the art round: `art/`, `public/art/`, the manifest, `cut-art.mjs`). That split ends when Step 2 is approved; fetch and merge `origin/dev` before every push regardless.
 
-- One app page that shows the screen for `state.phase`, driven by `reduce` in `src/engine/flow.ts`, saving after every action with `createSaveStore`.
-- The play screen reads the engine's round instead of its own stand-in rules, with real names and scores.
-- Plain screens built from the paper pieces that exist, with no new art: names and match length; setup (answer with a hide toggle, category with Other, difficulty preset to the setter's last pick); handoff (who is guessing, the difficulty, "It's me", a way back); result (heading, the full answer with missed letters marked, Next round); match over (winner, Rematch, New game). New game sits behind a confirmation on every screen. A calm notice shows if storage is unavailable.
-- A browser check that plays full rounds (win, loss, refresh mid-round, new game) at 320, 393 and 440 px.
-- Then a code review, a push to `dev`, and Drew plays it on his phone.
+- **Shape:** `src/app/main.ts` starts `src/app/app.ts`, which holds the `GameState`, runs every tap through `reduce`, saves with `createSaveStore`, and shows the screen for `state.phase`. `play` and `result` share the play screen (`src/paper/play.ts`, the keys give way to a result panel a second after the last guess); the other phases are in `src/app/screens.ts`. `src/app/copy.ts` holds the wording (the seven loss headings, picked by round so a refresh shows the same one). The sign-fitting maths is `src/paper/sign-fit.ts`, the yard painting is `src/paper/yard.ts`, piece names are `src/paper/art.ts`.
+- **Screens are plain on purpose** (cream cards, kraft chips, the snowman and sun in the yard). Designed versions come later, after mock-up options.
+- **The setup draft** (typed answer, category, difficulty, hide) lives in memory only, never in the save. "Change the answer" on the handoff screen brings it back with the answer **hidden**, because the guesser may be holding the phone.
+- **New game** is a small button between the name tags on every screen once a game has started, always behind a confirmation. The names screen has none (nothing to clear). A calm notice shows if storage is unavailable or a save could not be read.
+- **Checks:** `npm run check` now also runs `scripts/check-game.mjs`, which plays whole games (win, loss, refresh at each phase, new game, a "1 game" match to its winner and a rematch, long names, storage trouble) at 320, 393 and 440 px with no console errors. Screenshots from it are in `docs/step-2/`. Reviewed on Opus; its findings (secret reappearing on the way back, category tag covering letters, focus and screen-reader gaps) are fixed.
+- **Not tested, needs Drew's phone:** the on-screen keyboard over the setup form on iOS (whether Done stays reachable and how the page pans), WebKit itself (cloud sessions only have Chromium), the Home Screen app, and whether the screens feel right to a young reader.
+- **Known rough edges:** at 320 px a name tag shows only about 60 px of the name (full names show on the setup and handoff headings, and the setting/guessing labels tell players apart); a very long custom category (up to 60 characters) wraps to two lines above the sign and touches the snowman's feet; no animated transitions between screens yet (Phase 2).
 
 **Still open from Phase 1** (none of it blocks Step 2)
 
@@ -70,7 +72,7 @@ When another session's work is reviewed, the reviewer runs its tests and also wr
 
 ```bash
 npm run dev      # dev server on the local network, http://localhost:5173/meltdown/
-npm run check    # type-check, tap through a round, and fit-test the sign (needs the dev server running)
+npm run check    # type-check, tap through a round, fit-test the sign, and play whole games (needs the dev server running)
 npm run art      # cut the generated sheets into the pieces in public/art/
 npm run build    # type-check and build
 npm test         # engine unit tests (Vitest)
@@ -88,7 +90,8 @@ The site is served under `/meltdown/` in development too, to match `https://drew
 | --- | --- |
 | `BRIEF.md` | The brief and every decision since. Add new decisions there, dated. |
 | `BACKLOG.md` | Feature ideas and feedback to pick up later. Add new ones there; move built ones to "Done". |
-| `index.html`, `src/paper/play.ts` | The front page: the play screen, with stand-in game rules. Query: `?a=answer&c=category&limit=4,6 or 8&g=letters already guessed`. |
+| `index.html`, `src/app/` | The front page and the app: `app.ts` (state, saving, confirmation, notices), `screens.ts` + `screens.css` (names, setup, handoff, match over), `header.ts`, `copy.ts`, `dom.ts`. Demo link, never saved: `?a=answer&c=category&limit=4,6 or 8&g=letters already guessed`. |
+| `src/paper/play.ts` | The play and result screen, reading the engine's round. `sign-fit.ts`, `yard.ts` and `art.ts` sit beside it. |
 | `.github/workflows/deploy.yml` | Tests, builds and publishes every push to `dev` to GitHub Pages. |
 | `src/paper/paper.css` | The paper look: name tags, sign, keys, tray, thermometer. |
 | `src/paper/art-manifest.json` | Sizes of the cut pieces. Written by `npm run art`; do not edit by hand. |
@@ -97,7 +100,7 @@ The site is served under `/meltdown/` in development too, to match `https://drew
 | `art/prompts/` | Every image prompt, with which model, settings and reference images. |
 | `art/concepts/` | Mock-ups from the direction rounds. Reference only; they never ship. |
 | `docs/phase-1/` | Screenshots shown to Drew at check-ins. |
-| `scripts/` | `cut-art.mjs`, `shot.mjs`, `check-play.mjs`, `check-sign.mjs`, `use-chromium.mjs`. |
+| `scripts/` | `cut-art.mjs`, `shot.mjs`, `check-play.mjs`, `check-sign.mjs`, `check-game.mjs`, `use-chromium.mjs`. |
 
 ## How the art is made
 
