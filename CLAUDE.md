@@ -6,7 +6,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 
 **Every session ends by updating "Where things stand" below**, so the next session, on any model, can pick up without the conversation.
 
-## Where things stand (updated 2026-11-21, end of Step 2)
+## Where things stand (updated 2026-11-21, art round 4 cut and pushed)
 
 **The game goes live from `dev`.** Every push to `dev` publishes to https://drew879.github.io/meltdown/ (decided 2026-11-20; see `BRIEF.md`). Drew changed the Pages settings on 2026-11-20 so `dev` can publish. Cloud sessions cannot re-run or start the workflow by hand (the Claude GitHub App gets a 403), so redeploy by pushing to `dev`.
 
@@ -14,9 +14,17 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 - The answer limit is 45 characters (engine, sign and checks). At the limit, letters are 22 px at Drew's phone size (440x956).
 - The four engine calls are confirmed (`BRIEF.md`, 2026-11-20).
 - **Home Screen icon: done (2026-11-20, local session on the Mac).** It is the nervous-face tile Drew chose from the round 2 sheet (top left of `art/concepts/round-2/5-app-icons.jpg`), used as drawn, not redrawn. `index.html` links `apple-touch-icon.png` (180 px), a 32 px favicon and `manifest.webmanifest` (name, standalone, theme colours, icons). Preview with the iOS corner mask: `docs/icon/home-screen-preview.png`. Not yet seen on Drew's phone: iOS caches the icon when a page is added, so he needs to remove any old Home Screen shortcut and add the page again. The manifest is a basic one; offline play and the update prompt are still Phase 5.
-- **Known, not mine to fix here:** `check-game` fails in local WebKit with "focus should go back to the New game button" after tapping Keep playing, at all three widths. It fails the same with the icon change removed. It may be a real WebKit focus gap, so worth a look; Chromium is not installed on the Mac, so the Chromium run was not tried here.
+- **Known, not fixed: `check-game` fails in the Mac's WebKit with "focus should go back to the New game button"** after tapping Keep playing, at all three widths. It passes in Chromium (checked 2026-11-21 on the Mac: `PW_CHROMIUM= node --import ./scripts/use-chromium.mjs scripts/check-game.mjs`; an empty `PW_CHROMIUM` makes the shim use Playwright's own Chromium, which is installed). So the failure is WebKit, and it is real: `askNewGame` in `src/app/app.ts` takes `document.activeElement` as the button to return focus to, but Safari and iOS do not focus a button when it is tapped, so focus falls back to the page. Fix: remember the tapped button (the click's `currentTarget`) and focus that on close. Matters for VoiceOver and keyboard users on Safari. Left because it is outside art round 4's files.
 
-**Now: art round 4, which Drew is running** (agreed 2026-11-20). Prompts in `art/prompts/round-4-stage-3-and-win.md`: melt stage 3 redrawn (keeping the waving arm), and two win-celebration options (a backflip, a little dance) for Drew to pick from, plus an optional cloud and snowflakes. Drew saves his picks in `art/layers/originals/` as `snowman-3-redraw.png`, `win-backflip.png`, `win-dance.png` and `win-sky.png`, which are already in `SHEETS` in `scripts/cut-art.mjs` (the redraw replaces stage 3 when present). He generated and saved all four on his Mac on 2026-11-21. A local session on the Mac cuts and pushes them, because cloud sessions only see what is on GitHub. Then show him a lineup of stages 2 to 4 and the two celebrations side by side (`node scripts/lineup.mjs`).
+**Art round 4: cut and pushed to `dev` (2026-11-21); waiting for Drew's answers.** Drew generated the four sheets (GPT Image 2.6, Unlimited, so no credits) and a local session on the Mac cut them. Lineups are in `docs/phase-2/`: `stage-3-redraw.png`, `stage-3-as-drawn.png`, `win-backflip.png`, `win-dance.png`, `cloud-and-flakes.png`, and `game-stages-2-3-4-easy.png` (the real game on Easy). Nothing in the game uses the new pieces yet, except stage 3 in the melt.
+
+- **Stage 3 (`snowman-3`)** is the middle figure of `snowman-3-redraw.png`. The prompt put a copy of stage 5, not stage 4, on the sheet's right, so the middle figure came out 689 px tall, shorter than stage 4's 729. It is scaled up 9.6% (`TWEAK` in `cut-art.mjs`) to 755 px, so the heights run 780, 755, 729 and the hat tops step down evenly in the game. Its hat is 215 px wide against 205 (stage 2) and 193 (stage 4). It is 606 wide against stage 2's 632 (4% narrower): no one scale makes it shorter than 2, taller than 4 and as wide as 2. Set `'snowman-3': 1` to go back to the figure as drawn.
+- **Win poses** (`win-backflip-1..4`, `win-dance-1..4`; read top left, top right, bottom left, bottom right): drawn 6 to 19% smaller than the fresh snowman by hat area, so `TWEAK` scales backflip by 1.10 and dance by 1.19, putting every hat at 96 to 104% of stage 0's. Heights as a share of stage 0 (912 px): backflip 65, 69, 74 and 91%; dance 98, 97, 107 and 103%. The dance poses are the more on-model pair. Backflip 1 (crouch) has a fierce frown and backflip 2 is upside down with the hat under the head, which may read oddly. Dance 3 holds the hat just above the head with a hand still on it.
+- **Cloud and six snowflakes** cut cleanly (`cloud` 900x416, `flake-1..6` about 330x370). Drew decides whether they are worth keeping.
+- **Cutting changes:** the redraw sheet needs `join: 10` (at 12 or more the middle and right puddles merge into one piece). Crops now drop pixels that belong to a neighbouring island: stage 3 had 856 pixels of the left figure's arm tip in it. Only stage 3 was affected; every other piece re-cuts byte for byte.
+- **Open, for Drew:** does the new stage 3 fix the melt order; backflip or dance; keep the cloud and flakes. Once he picks, remove the unused celebration's entries from `SHEETS` and re-cut so its pieces stop loading (ask first). Phase 2 has not started.
+- **Weight:** art is now 2.54 MB (was 1.46 MB): the win poses add about 0.9 MB and the cloud and flakes 0.25 MB. `preloadArt()` in `src/paper/art.ts` (called from `src/app/app.ts`) fetches every piece in the manifest on every page load, so all of that downloads on first load until preloading is changed to load only what the current screen needs.
+- A stray Finder screenshot, `art/layers/originals/Pasted 2026-11-20 at 11.16.08 PM.png`, is untracked in the originals folder. It is not art and was not committed; Drew can delete it.
 
 **Step 2, make it playable: built and pushed to `dev` on 2026-11-21; waiting for Drew to play it on his phone.** It ran in its own cloud session alongside art round 4. While both ran they split the files (this session: `index.html`, `src/` except the manifest, `scripts/check-*.mjs`, tests; the art round: `art/`, `public/art/`, the manifest, `cut-art.mjs`). That split ends when Step 2 is approved; fetch and merge `origin/dev` before every push regardless.
 
@@ -33,7 +41,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 - Drew's sign change, done: the nail heads at the board's ends looked odd with nothing behind them, so `scripts/cut-art.mjs` paints them out (2026-11-20). The category tag's two nails, which sat above the board's top edge, are gone too (2026-11-21).
 - Approval of Phase 1.
 - First real-phone look (2026-11-20): the live page loads and looks good on Drew's iPhone.
-- **Melt stage 3 runs backwards** (being redrawn in round 4). Drew saw the snowman get taller going into the arm-lift pose. Stage 3 came from a different sheet (`snowman-3-5.png`): its hat sits above stage 2's (786 vs 780 px), and it is slimmer and more upright with a waving arm. Shrinking it to 94% fixes the height but leaves a smaller hat and a slimmer body, so 3 to 4 then looks like widening; see `docs/phase-1/11-melt-stage-3.jpg`. Drew chose a redraw (not the shrink), in the same round as the win poses.
+- **Melt stage 3 ran backwards**, so it was redrawn in round 4 (cut and pushed 2026-11-21; see above). Drew saw the snowman get taller going into the arm-lift pose: the old stage 3 (`snowman-3-5.png`) had its hat above stage 2's (786 vs 780 px) and was slimmer and more upright; see `docs/phase-1/11-melt-stage-3.jpg`. The redraw is live and the heights now step down, but Drew has not yet confirmed it looks right on his phone.
 
 **After Step 2:** Phase 2 animation (melt beats, the win celebration with new poses, the loss sequence), designed versions of the new screens (mock-up options first), Phase 4 audio, the rest of Phase 5 (offline play, update prompt, README, moving the live site to `main`), and Phase 6 QA.
 
@@ -42,7 +50,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 **Known gaps**
 
 - No iPad layout yet. Screens 320 px wide work but are cramped; a 24-letter single word there gets 9.5 px letters.
-- Art is 1.46 MB. The target is well under 2 MB for the first load, so later melt stages should load after the first screen. `src/paper/play.ts` preloads every piece in the manifest, so once the round 4 win poses are cut it will also fetch them on every load; preload only what the current screen needs.
+- Art is 2.54 MB, over the target of well under 2 MB for the first load. Later melt stages, the win poses and the cloud and flakes should load after the first screen: `preloadArt()` in `src/paper/art.ts` fetches every piece in the manifest on every load. Preload only what the current screen needs.
 - The first direction (a beach, drawn in code) is still in the repo: `src/art/`, `src/ui/`, `direction/index.html`, `direction/play.html`, `direction/board.*`. It was replaced by the paper look and is not in the build. Delete it once Phase 1 is approved; ask first.
 
 ## How we work
@@ -104,7 +112,7 @@ The site is served under `/meltdown/` in development too, to match `https://drew
 | `art/layers/originals/` | Full-size generated sheets, stored with Git LFS. |
 | `art/prompts/` | Every image prompt, with which model, settings and reference images. |
 | `art/concepts/` | Mock-ups from the direction rounds. Reference only; they never ship. |
-| `docs/phase-1/` | Screenshots shown to Drew at check-ins. |
+| `docs/phase-1/`, `docs/phase-2/` | Screenshots and lineups shown to Drew at check-ins (`phase-2` holds the round 4 art). |
 | `scripts/` | `cut-art.mjs`, `make-icon.mjs`, `lineup.mjs` (cut pieces side by side on one baseline), `shot.mjs`, `check-play.mjs`, `check-sign.mjs`, `check-game.mjs`, `use-chromium.mjs`. |
 
 ## How the art is made
@@ -117,6 +125,8 @@ The site is served under `/meltdown/` in development too, to match `https://drew
 Rules of thumb that cost time to learn:
 
 - **Melt stages:** nine pictures, 0 (fresh) to 8 (puddle), shared by all difficulties. A round with N misses allowed shows stage `round(misses * 8 / N)`. All nine are cut to one scale, taken from the hat's width.
+- **Check a new sheet before trusting its names:** `npm run art -- --list` must show the expected count. Two figures whose edges touch within `join` pixels come out as one piece (round 4's stage 3 sheet needed `join: 10`); lower `join` until they split. A crop drops pixels of any neighbouring piece, so a close neighbour's arm tip cannot leak in.
+- **Sizes are judged against the neighbouring stage, not the sheet.** A sheet's scale comes from its widest hat, so a figure can still land the wrong size next to a stage from another sheet. Check with `node scripts/lineup.mjs out.png <pieces...>` (heights are printed under each) and correct with `TWEAK` in `cut-art.mjs`, with a comment saying why.
 - **The sign:** one board holding one to three rows. Three board pictures exist (long, medium, tall); the script picks the closest shape, keeps the ragged ends as drawn and stretches only the middle. Rows are split so the longest is as short as possible. The cutting script paints out the nail heads drawn at the board's ends.
 - **Motion** is stop-motion: stepped poses (`steps()`), not smooth glides. Honour `prefers-reduced-motion`.
 
