@@ -142,6 +142,7 @@ for (const [w, h] of SIZES) {
     );
     // the hide toggle keeps the answer but hides the letters
     await page.getByLabel('The secret answer').fill('Polar Bear');
+    say((await page.getByRole('button', { name: 'Hide' }).getAttribute('aria-pressed')) === 'false', 'the Hide button should say it is not pressed');
     await page.getByRole('button', { name: 'Hide' }).click();
     say((await page.locator('.pp-input.secret.hide').count()) === 1, 'Hide should hide the answer');
     await page.getByRole('button', { name: 'Show' }).click();
@@ -156,6 +157,8 @@ for (const [w, h] of SIZES) {
     await fits(p, 'handoff');
     await page.getByRole('button', { name: 'Change the answer' }).click();
     say((await page.getByLabel('The secret answer').inputValue()) === 'Polar Bear', 'going back should keep what was typed');
+    say((await page.locator('.pp-input.secret.hide').count()) === 1, 'going back from the handoff should bring the answer back hidden, as the guesser may be holding the phone');
+    await page.getByRole('button', { name: 'Show' }).click();
     await page.getByRole('button', { name: 'Done', exact: true }).click();
     await page.getByRole('button', { name: "It's me" }).click();
 
@@ -239,6 +242,7 @@ for (const [w, h] of SIZES) {
     say((await saved(page)).round.guessed.join('') === 'SXN', 'the keyboard should not guess while the confirmation is open');
     await page.getByRole('button', { name: 'Keep playing' }).click();
     say((await page.getByRole('alertdialog').count()) === 0, 'Keep playing should close the confirmation');
+    say(await page.evaluate(() => document.activeElement?.classList.contains('pp-menu')), 'focus should go back to the New game button');
     say((await saved(page)).phase === 'play', 'Keep playing should change nothing');
     await page.locator('.pp-menu').click();
     await page.getByRole('alertdialog').getByRole('button', { name: 'New game' }).click();

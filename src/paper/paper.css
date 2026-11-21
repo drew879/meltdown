@@ -209,7 +209,7 @@
   position: absolute;
   z-index: 3;
   left: 50%;
-  bottom: calc(100% - 17px);
+  bottom: calc(100% - var(--overlap, 17px));
   width: max-content;
   max-width: 88vw;
   box-sizing: border-box;

@@ -26,6 +26,17 @@
   grid-template-columns: minmax(0, 1fr);
   justify-items: center;
 }
+/* the keys and the result panel share one cell, so the sign never moves between them */
+.pp-lower > * {
+  grid-area: 1 / 1;
+}
+.pp-tray.away {
+  visibility: hidden;
+}
+.pp h1:focus,
+.pp h2:focus {
+  outline: none;
+}
 .pp-sr {
   position: absolute;
   width: 1px;

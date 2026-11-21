@@ -70,7 +70,8 @@ export function startApp(host: HTMLElement) {
 
   const yard = createYard();
   const screenHost = el('div', { class: 'pp-screens' });
-  const notices = el('div', { class: 'pp-notices' });
+  // a live region that exists from the start, so screen readers announce what is added to it
+  const notices = el('div', { class: 'pp-notices', role: 'status', 'aria-live': 'polite' });
   host.replaceChildren(yard, screenHost, notices);
   preloadArt();
   // pages leave room under the name tags for a notice, so it never covers their words
@@ -80,7 +81,7 @@ export function startApp(host: HTMLElement) {
     if ([...notices.children].some((n) => n.textContent?.startsWith(text))) return;
     const note = el(
       'div',
-      { class: 'pp-notice', role: 'status' },
+      { class: 'pp-notice' },
       text,
       el('button', { type: 'button', class: 'pp-notice-ok', onclick: () => note.remove() }, 'OK'),
     );
@@ -102,6 +103,7 @@ export function startApp(host: HTMLElement) {
   let draft: SetupDraft = emptyDraft();
   let play: PlayScreen | null = null;
   let relayout: () => void = () => {};
+  let shownPhase: GameState['phase'] | null = null;
   let dialogOpen = false;
 
   function dispatch(action: Action): Reduction {
@@ -133,7 +135,7 @@ export function startApp(host: HTMLElement) {
             category: category.id,
             custom: category.custom ?? '',
             difficulty: round.difficulty as Difficulty,
-            hidden: false,
+            hidden: true, // the guesser may be holding the phone: come back with the answer hidden
           };
         }
         dispatch({ type: 'backToSetup' });
@@ -176,18 +178,27 @@ export function startApp(host: HTMLElement) {
       relayout = () => next.layout();
     }
     screenHost.toggleAttribute('inert', dialogOpen);
+    // a new screen: put focus on its heading so screen readers say where they are
+    if (state.phase !== shownPhase && state.phase !== 'play' && state.phase !== 'result') {
+      screenHost.querySelector<HTMLElement>('h1, h2')?.focus({ preventScroll: true });
+    }
+    shownPhase = state.phase;
   }
 
   // ---- starting a new game, always behind a confirmation ----
   function askNewGame() {
     if (dialogOpen) return;
     dialogOpen = true;
+    const opener = document.activeElement as HTMLElement | null;
     screenHost.toggleAttribute('inert', true);
+    notices.toggleAttribute('inert', true);
     const close = () => {
       dialogOpen = false;
       removeEventListener('keydown', onKey, true);
       scrim.remove();
       screenHost.toggleAttribute('inert', false);
+      notices.toggleAttribute('inert', false);
+      if (opener?.isConnected) opener.focus({ preventScroll: true });
     };
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') close();

@@ -24,6 +24,11 @@ const CASES = [
   [LONG, 320, 568],
   ['Supercalifragilisticexpi', 440, 956],
   ['Supercalifragilisticexpi', 320, 568],
+  // the category tag must never cover the letters, however short the board or long the category
+  ['Supercalifragilisticexpi docious', 393, 852, 'Animal'],
+  ['The Quick Brown Fox Jumps Over', 393, 852, 'Movie or TV show'],
+  ['Cat', 320, 568, 'A category as long as the game allows, sixty characters!'],
+  ['Cat', 440, 956, 'A category as long as the game allows, sixty characters!'],
 ];
 
 // the page has to be served first
@@ -34,12 +39,12 @@ if (!(await fetch(URL).then((r) => r.ok, () => false))) {
 
 const problems = [];
 const browser = await webkit.launch();
-for (const [answer, w, h] of CASES) {
+for (const [answer, w, h, category = 'Place'] of CASES) {
   const page = await browser.newPage({ viewport: { width: w, height: h } });
   const where = `"${answer}" at ${w}x${h}`;
   page.on('console', (m) => m.type() === 'error' && problems.push(`${where}: console error: ${m.text()}`));
   page.on('pageerror', (e) => problems.push(`${where}: page error: ${e}`));
-  await page.goto(`${URL}?still&a=${encodeURIComponent(answer)}`, { waitUntil: 'networkidle' });
+  await page.goto(`${URL}?still&a=${encodeURIComponent(answer)}&c=${encodeURIComponent(category)}`, { waitUntil: 'networkidle' });
   await page.evaluate(() => document.fonts.ready);
   const r = await page.evaluate(() => {
     const board = document.getElementById('board').getBoundingClientRect();
@@ -57,6 +62,7 @@ for (const [answer, w, h] of CASES) {
       onScreen: board.left >= 0 && board.right <= innerWidth,
       inside,
       scrolls: document.documentElement.scrollHeight > innerHeight,
+      tagOverRow: Math.round(document.getElementById('category').getBoundingClientRect().bottom - document.querySelector('.pp-row').getBoundingClientRect().top),
       snowman: Math.round(document.getElementById('snowman').getBoundingClientRect().height),
     };
   });
@@ -66,6 +72,7 @@ for (const [answer, w, h] of CASES) {
   if (!r.inside) problems.push(`${where}: a letter falls outside the board`);
   if (!r.onScreen) problems.push(`${where}: the sign runs off the screen`);
   if (r.scrolls) problems.push(`${where}: the page scrolls`);
+  if (r.tagOverRow > 1) problems.push(`${where}: the category tag covers the first row by ${r.tagOverRow}px`);
   if (r.snowman < 90) problems.push(`${where}: the snowman is squeezed to ${r.snowman}px`);
   await page.close();
 }

@@ -90,7 +90,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
   const signbox = el('div', { class: 'pp-signbox', id: 'signbox' }, board, category);
   const sign = el('section', { class: 'pp-sign', id: 'sign', 'aria-label': 'The answer' }, signbox);
   const tray = el('div', { class: 'pp-tray', id: 'tray', 'aria-label': 'Letters' });
-  const headline = el('h2', { class: 'pp-headline' });
+  const headline = el('h2', { class: 'pp-headline', tabindex: -1 });
   const note = el('p', { class: 'pp-note' });
   const nextButton = el('button', { class: 'pp-btn', id: 'next', type: 'button', onclick: () => deps.onNext() });
   const result = el('div', { class: 'pp-result', id: 'result', hidden: true }, headline, note, nextButton);
@@ -130,6 +130,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
   let moodTimer = 0;
   let resultTimer = 0;
   let popLetter: string | undefined;
+  let destroyed = false;
 
   const outcome = () => (round ? roundOutcome(round) : 'playing');
   const stage = () => (!round || outcome() === 'won' ? 0 : roundMeltStage(round));
@@ -164,6 +165,9 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     board.style.borderImageSource = `url(${art(fit.sign.piece)})`;
     board.style.borderImageSlice = `0 ${fit.sign.end * 100}% fill`;
     board.style.borderImageWidth = `0 ${fit.end}px`;
+    // the category tag overlaps the board's top edge, but never further than the plain wood above the first row
+    const textHeight = slot * (1.3 * rows.length + 0.3 * (rows.length - 1));
+    signbox.style.setProperty('--overlap', `${Math.max(2, Math.min(17, (fit.height - textHeight) / 2 - 5))}px`);
     signbox.style.setProperty('--flower', `${Math.max(46, Math.min(72, 30 + fit.height * 0.42))}px`);
     answerEl.style.setProperty('--slot', `${slot}px`);
     answerEl.replaceChildren();
@@ -241,6 +245,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
 
   function showStage(next: number, animate: boolean) {
     const apply = () => {
+      if (destroyed) return;
       shownStage = next;
       snowman.src = art(snowmanPiece(next));
       layoutScene();
@@ -293,10 +298,11 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     const over = currentMatchStatus(state).over;
     nextButton.textContent = over ? 'See who won' : 'Next round';
     const reveal = () => {
-      const height = tray.offsetHeight; // keep the sign where it is when the keys go away
-      if (height > 0) result.style.minHeight = `${height}px`;
-      tray.hidden = true;
+      // the panel takes the keys' place in the same cell, so nothing moves when they go away
+      tray.classList.add('away');
+      tray.inert = true;
       result.hidden = false;
+      if (live) headline.focus({ preventScroll: true }); // screen readers read the result out
     };
     clearTimeout(resultTimer);
     if (live && !reduceMotion) resultTimer = window.setTimeout(reveal, RESULT_DELAY_MS);
@@ -329,6 +335,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       drawNotches(missLimit(round));
       markKeys();
       drawAnswer();
+      popLetter = undefined; // the pop plays once, not again on every resize
 
       if (event) {
         const status = event.status;
@@ -352,11 +359,13 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
 
       if (phase === 'result') showResult(state, !!event);
       else {
-        tray.hidden = false;
+        tray.classList.remove('away');
+        tray.inert = false;
         result.hidden = true;
       }
     },
     destroy() {
+      destroyed = true;
       removeEventListener('keydown', onKeydown);
       clearTimeout(moodTimer);
       clearTimeout(resultTimer);
