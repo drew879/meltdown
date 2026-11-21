@@ -27,6 +27,7 @@ Rules it follows:
 
 - **The plain snowman takes the new stage at once**, hidden behind the beat. Whatever cuts a beat short (another guess, a resize, a new screen) finds him where he should be, so quick taps cannot leave anything half done. A wrong key is switched off the moment it is tapped.
 - **Skip:** during the loss, a tap anywhere but the name tags, or Enter, Space or Escape, jumps to the puddle at rest and brings the result up. It listens for the press (`pointerdown`), so the tap on the last wrong key cannot skip its own melt.
+- **The answer waits for the melt** (Drew, 2026-11-21): while the loss plays, the sign keeps showing the round as it was before the last miss. The answer and its missed letters come up with the heading when the melt ends or is skipped. With reduced motion, and on a refresh of a lost round, everything shows at once.
 - **Reduced motion and `?still`:** no beat (the new stage simply shows), and a lost round is the puddle as a still picture, with the result up at once.
 - **A refresh** mid-round shows the stage with no beat; on a lost round it shows the puddle at rest (bobbing and blinking, unless motion is reduced), with no replay.
 - **The hat** jumps across to above where it will land and hangs with its middle at 0.6 of his height, whichever stage it came off. Higher than that and, on Hard on a 320 px phone, it ran into the sun.
@@ -56,4 +57,3 @@ The puddle has no eyes drawn on it: the open and closed eyes are two pieces that
 - Nothing has been on a real phone, and VoiceOver has not been tried.
 - Sound (Phase 4): the beat and the loss have clear moments to hang sounds on (the flare at 0, each stage of the slump, the splat at 360 ms, the hat landing at 1730 ms).
 - On a 320 px phone the sun at its biggest overlaps his head on the stage before a loss. That is the play screen's layout, not the melt, and was there before.
-- The answer's missed letters appear on the sign the moment the round is lost, while the melt plays. They could wait for the melt to finish, with the heading; that is a call for Drew.

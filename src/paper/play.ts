@@ -147,6 +147,12 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
   let resultTimer = 0;
   /** Bumped whenever the result's reveal is planned afresh, so an older wait (for a melt that has since been replaced) does nothing. */
   let resultRun = 0;
+  /**
+   * True while the melt of a lost round plays: the sign keeps showing the round as it was before the
+   * last miss, and the answer with its missed letters comes up with the heading when the melt ends
+   * (Drew, 2026-11-21).
+   */
+  let holdAnswer = false;
   let popLetter: string | undefined;
   let destroyed = false;
 
@@ -189,7 +195,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     signbox.style.setProperty('--flower', `${Math.max(46, Math.min(72, 30 + fit.height * 0.42))}px`);
     answerEl.style.setProperty('--slot', `${slot}px`);
     answerEl.replaceChildren();
-    const cells = roundCells(round, outcome() === 'lost');
+    const cells = roundCells(round, outcome() === 'lost' && !holdAnswer);
     let index = 0;
     for (const row of rows) {
       const rowEl = el('div', { class: 'pp-row' });
@@ -350,7 +356,15 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     };
     clearTimeout(resultTimer);
     const run = ++resultRun;
-    if (after) void after.then(() => !destroyed && run === resultRun && reveal());
+    if (after) {
+      void after.then(() => {
+        if (destroyed || run !== resultRun) return;
+        // the melt is over (played out or skipped): the answer comes up on the sign with the heading
+        holdAnswer = false;
+        drawAnswer();
+        reveal();
+      });
+    }
     else if (live && !reduceMotion) resultTimer = window.setTimeout(reveal, RESULT_DELAY_MS);
     else reveal();
   }
@@ -381,6 +395,9 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       category.classList.toggle('long', Array.from(label).length > 24);
       drawNotches(missLimit(round));
       markKeys();
+      // A wrong guess that has just been made melts him, unless motion is reduced.
+      const melting = !!event && event.status === 'wrong' && !reduceMotion && stageBefore >= 0;
+      holdAnswer = melting && outcome() === 'lost';
       drawAnswer();
       popLetter = undefined; // the pop plays once, not again on every resize
 
@@ -403,7 +420,6 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       // A wrong guess melts him: a beat down to the next stage, or on the last one the melt into the
       // puddle. The plain snowman takes the new stage at once, behind the melt, so whatever interrupts
       // the beat (another guess, a resize, the screen going away) finds him where he should be.
-      const melting = !!event && event.status === 'wrong' && !reduceMotion && stageBefore >= 0;
       let lossPlayed: Promise<void> | undefined;
       let settled = Promise.resolve();
       if (outcome() === 'lost') {

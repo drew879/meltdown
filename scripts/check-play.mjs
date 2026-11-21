@@ -66,6 +66,7 @@ for (const ch of ['T', 'X', 'Q', 'Z', 'W']) {
 // the melt plays before the result comes up; Escape skips it
 const waiting = await read();
 expect(!waiting.resultShown, 'the result should wait for the melt after the last miss');
+expect(waiting.missedLetters === 0 && waiting.answer === 'Animal: blank blank blank a r   blank e a r', `the sign should keep the round as it was while the melt plays, got "${waiting.answer}"`);
 await page.keyboard.press('Escape');
 await page.waitForTimeout(300);
 const end = await read();

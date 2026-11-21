@@ -10,8 +10,9 @@
 // middle of a round, a new game behind its confirmation, a "1 game" match played
 // to its winner and a rematch, and the notices for a phone that cannot save.
 // The melt: the beat on a wrong guess, quick taps during it, the loss (the hat
-// left hanging) and how long it takes, a tap to skip it, a refresh on a lost
-// round, and a phone that asks for reduced motion.
+// left hanging) and how long it takes, the answer staying off the sign until
+// it ends, a tap to skip it, a refresh on a lost round, and a phone that asks
+// for reduced motion.
 // Made-up names only: Sam and Dad.
 import { webkit } from '@playwright/test';
 
@@ -262,15 +263,19 @@ for (const [w, h] of SIZES) {
     const lostAt = Date.now();
     await tap(p, 'W');
     say((await resultShown(page)) === false, 'the result should wait for the melt');
+    say((await page.locator('.pp-slot.missed').count()) === 0, 'the sign should not give the answer away the moment the round is lost');
+    say((await page.locator('#answer').getAttribute('aria-label')) === 'Pet: blank blank blank', `the sign should keep the round as it was while the melt plays, got "${await page.locator('#answer').getAttribute('aria-label')}"`);
     say((await page.locator('.pp-key:not(:disabled)').count()) === 0, 'no key should work once the round is lost');
     await page.waitForTimeout(700);
     const hanging = await melt(page);
     say(hanging.on && hanging.body === 'puddle' && hanging.hat === 'hat-6', `from stage 6 his own hat should be left hanging over the puddle, got ${JSON.stringify(hanging)}`);
     say((await resultShown(page)) === false, 'the result should still be waiting while the hat hangs');
+    say((await page.locator('.pp-slot.missed').count()) === 0 && (await page.locator('#answer').innerText()).trim() === '', 'the answer should still be hidden on the sign while the hat hangs');
     await p.shot('6b-hat-left-hanging');
     await page.locator('#result').waitFor({ state: 'visible', timeout: 5000 });
     const took = Date.now() - lostAt;
     say(took >= 2000 && took <= 3600, `the melt should take two to three seconds before the result, took ${took} ms`);
+    say((await page.locator('.pp-slot.missed').count()) === 3 && (await page.locator('#answer').innerText()).replace(/\s/g, '') === 'CAT', 'the answer and its missed letters should come up on the sign with the heading, when the melt ends');
     const atRest = await melt(page);
     say(atRest.on && atRest.aside && atRest.body === 'puddle' && atRest.hat === 'puddle-hat', `a lost round should end as the puddle with the hat floating on it, got ${JSON.stringify(atRest)}`);
     say(atRest.hatTop > hanging.hatTop, 'the hat should have come down from where it hung');
@@ -294,6 +299,7 @@ for (const [w, h] of SIZES) {
     await page.waitForTimeout(300);
     say((await resultShown(page)) === true, 'refreshing on a lost result should keep it, with no wait');
     say((await page.locator('.pp-headline').textContent()) === heading, 'the loss heading should survive a refresh');
+    say((await page.locator('.pp-slot.missed').count()) === 3, 'a refresh on a lost round should show the answer and its missed letters at once');
     const reloaded = await melt(page);
     say(reloaded.on && reloaded.body === 'puddle' && reloaded.hat === 'puddle-hat' && reloaded.bits === 0, `a refresh on a lost round should show the puddle at rest, not play the melt again, got ${JSON.stringify(reloaded)}`);
     say((await page.locator('#snowman').getAttribute('alt')) === 'The snowman is a puddle.', 'the puddle should still be described after a refresh');
@@ -370,10 +376,12 @@ for (const [w, h] of SIZES) {
     await page.waitForTimeout(500);
     const playing = await melt(page);
     say(playing.on && playing.hat === 'hat-7' && (await resultShown(page)) === false, `the tap on the last wrong key should start the melt, not skip it, got ${JSON.stringify(playing)}`);
+    say((await page.locator('.pp-slot.missed').count()) === 0, 'the answer should be held back while the melt plays');
     const yard = await page.locator('#scene').boundingBox();
     await page.mouse.click(yard.x + yard.width / 2, yard.y + yard.height / 3);
     await page.waitForTimeout(250);
     say((await resultShown(page)) === true, 'a tap should skip the melt and bring up the result');
+    say((await page.locator('.pp-slot.missed').count()) === 3 && (await page.locator('#answer').innerText()).replace(/\s/g, '') === 'ICE', 'a skipped melt should show the answer and its missed letters at once');
     const skipped = await melt(page);
     say(skipped.body === 'puddle' && skipped.hat === 'puddle-hat' && skipped.bits === 0, `a skipped melt should jump to the puddle at rest, got ${JSON.stringify(skipped)}`);
     say(/See who won/.test(await page.locator('#next').textContent()), 'the last round of a match should say who won next');
@@ -404,6 +412,7 @@ for (const [w, h] of SIZES) {
     for (const ch of ['Q', 'Z', 'W']) await tap(p, ch);
     await page.waitForTimeout(200);
     say((await resultShown(page)) === true, 'with reduced motion the result should come up without waiting for a melt');
+    say((await page.locator('.pp-slot.missed').count()) === 3, 'with reduced motion the answer and its missed letters should show at once');
     const still = await melt(page);
     say(still.on && still.body === 'puddle' && still.hat === 'puddle-hat' && still.bits === 0, `with reduced motion a lost round should show the puddle at rest, got ${JSON.stringify(still)}`);
     await page.waitForTimeout(800);
