@@ -10,7 +10,7 @@
     "preview": "vite preview --host",
     "typecheck": "tsc --noEmit",
     "art": "node scripts/cut-art.mjs",
-    "check": "tsc --noEmit && node scripts/check-play.mjs && node scripts/check-sign.mjs",
+    "check": "tsc --noEmit && node scripts/check-play.mjs && node scripts/check-sign.mjs && node scripts/check-game.mjs",
     "test": "vitest run"
   },
   "devDependencies": {

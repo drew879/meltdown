@@ -4,8 +4,9 @@
 //   npm run dev            (in another terminal; the page must be served)
 //   node scripts/check-play.mjs [folder for screenshots]
 //
-// This checks the stand-in round on the front page (index.html). When the real
-// game exists, its browser tests replace this.
+// This checks the play screen alone, through the demo link (?a=answer&c=category),
+// which builds a round with the real engine and never saves. check-game.mjs plays
+// whole games through every screen.
 import { webkit } from '@playwright/test';
 
 const URL = process.env.MELTDOWN_URL ?? 'http://localhost:5173/meltdown/';
@@ -37,7 +38,7 @@ const read = () =>
     boards: document.querySelectorAll('.pp-board').length,
     rows: document.querySelectorAll('.pp-row').length,
     missedLetters: document.querySelectorAll('.pp-slot.missed').length,
-    playAgain: !document.getElementById('again').hidden,
+    resultShown: !document.getElementById('result').hidden,
   }));
 
 // three right letters and two wrong ones, by tapping
@@ -55,7 +56,7 @@ expect(mid.alt.includes('4 misses left'), `the snowman's description should say 
 expect(mid.answer === 'Animal: blank blank blank a r   blank e a r', `unexpected answer label "${mid.answer}"`);
 expect(mid.boards === 1 && mid.rows === 1, `Polar Bear should sit on one sign in one row, got ${mid.boards} and ${mid.rows}`);
 expect(!mid.scrolls, 'the page should not scroll');
-expect(!mid.playAgain, 'the round should not be over yet');
+expect(!mid.resultShown, 'the round should not be over yet');
 
 // a repeat, then four more wrong letters from a physical keyboard: the round is lost
 for (const ch of ['T', 'X', 'Q', 'Z', 'W']) {
@@ -68,7 +69,7 @@ if (shots) await page.screenshot({ path: `${shots}/paper-polar-lost.png` });
 expect(/snowman-8\.webp$/.test(end.snowman), `a lost round should show the puddle, got ${end.snowman}`);
 expect(end.miss.length === 6, `a repeated letter should be ignored, leaving 6 wrong keys, got ${end.miss.length}`);
 expect(end.missedLetters === 4, `the four unguessed letters should be shown as missed, got ${end.missedLetters}`);
-expect(end.playAgain, 'the play again button should be showing');
+expect(end.resultShown, 'the result panel should be showing');
 
 await browser.close();
 if (problems.length) {

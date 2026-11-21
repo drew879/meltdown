@@ -22,7 +22,7 @@ const CASES = [
   [LONG, 440, 956],
   [LONG, 375, 667],
   [LONG, 320, 568],
-  ['Supercalifragilisticexpia', 440, 956],
+  ['Supercalifragilisticexpi', 440, 956],
   ['Supercalifragilisticexpi', 320, 568],
 ];
 
