@@ -211,7 +211,7 @@
   z-index: 3;
   left: 50%;
   top: -17px;
-  padding: 4px 22px 3px;
+  padding: 4px 16px 3px;
   border-radius: 7px 8px 6px 9px;
   background: var(--coral) var(--grain);
   box-shadow: 0 2px 0 rgba(90, 30, 20, 0.35), 0 4px 4px rgba(40, 40, 10, 0.4);
@@ -220,24 +220,6 @@
   text-transform: uppercase;
   white-space: nowrap;
   transform: translateX(-50%) rotate(-1deg);
-}
-.pp-category::before,
-.pp-category::after {
-  /* two nail heads */
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 6px;
-  height: 6px;
-  margin-top: -3px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #77706b, #3a3531 70%);
-}
-.pp-category::before {
-  left: 8px;
-}
-.pp-category::after {
-  right: 8px;
 }
 
 /* the post, and the flowers, snow and grass at the foot of the sign */
