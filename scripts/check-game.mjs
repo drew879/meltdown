@@ -9,6 +9,9 @@
 // It covers: names, setup, handoff, a won round, a lost round, a refresh in the
 // middle of a round, a new game behind its confirmation, a "1 game" match played
 // to its winner and a rematch, and the notices for a phone that cannot save.
+// The melt: the beat on a wrong guess, quick taps during it, the loss (the hat
+// left hanging) and how long it takes, a tap to skip it, a refresh on a lost
+// round, and a phone that asks for reduced motion.
 // Made-up names only: Sam and Dad.
 import { webkit } from '@playwright/test';
 
@@ -32,8 +35,8 @@ if (!(await fetch(URL).then((r) => r.ok, () => false))) {
 const browser = await webkit.launch();
 
 /** A fresh phone: its own storage, so games never leak from one run into the next. */
-async function newPhone(w, h, label, { init } = {}) {
-  const context = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2 });
+async function newPhone(w, h, label, { init, reducedMotion } = {}) {
+  const context = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 2, reducedMotion });
   if (init) await context.addInitScript(init);
   const page = await context.newPage();
   const where = `${label} at ${w}x${h}`;
@@ -99,6 +102,26 @@ async function guessAll(p, letters) {
 const snowmanSrc = (page) => page.evaluate(() => document.getElementById('snowman').getAttribute('src'));
 const celebrationPose = (page) => page.evaluate(() => document.querySelector('.pp-cel-actor img:not([hidden])')?.getAttribute('src') ?? '');
 const flakesInTheAir = (page) => page.locator('.pp-cel-flake:not([hidden])').count();
+/** What the melt is showing: the pictures on screen by name, and whether it has taken the plain snowman's place. */
+const melt = (page) =>
+  page.evaluate(() => {
+    const box = document.querySelector('.pp-melt');
+    const shown = (sel) => [...document.querySelectorAll(sel)].filter((i) => !i.hidden).map((i) => i.dataset.piece);
+    const hat = [...document.querySelectorAll('.pp-melt-hat')].find((i) => !i.hidden);
+    return {
+      on: !box.hidden,
+      aside: document.getElementById('snowman').classList.contains('aside'),
+      body: box.hidden ? null : (shown('.pp-melt-body')[0] ?? null),
+      hat: box.hidden || !hat ? null : hat.dataset.piece,
+      hatTop: hat ? hat.getBoundingClientRect().top : null,
+      hatTurn: hat ? hat.style.transform.replace(/^.*rotate\(([-\d.]+)deg\).*$/, '$1') : null,
+      eyes: box.hidden ? [] : shown('.pp-melt-actor img[data-piece^="puddle-eyes"]'),
+      flare: !document.querySelector('.pp-melt-flare').hidden,
+      sunScale: document.querySelector('.pp-sun').style.scale,
+      bits: box.hidden ? 0 : shown('.pp-melt-bits img').length,
+    };
+  });
+const resultShown = (page) => page.locator('#result').isVisible();
 const tags = (page) => page.evaluate(() => [...document.querySelectorAll('.pp-tags .pp-tag')].map((t) => t.innerText.replace(/\s+/g, ' ').trim()));
 
 // ---------------------------------------------------------------------------
@@ -167,8 +190,24 @@ for (const [w, h] of SIZES) {
     // play: a win, with a wrong letter on the way
     say((await tags(page))[0] === 'DAD 0 SETTING' && (await tags(page))[1] === 'SAM 0 GUESSING', `the tags should show the roles, got ${JSON.stringify(await tags(page))}`);
     await fits(p, 'play', { playScreen: true });
-    await guessAll(p, ['A', 'R', 'E', 'X']);
+    await guessAll(p, ['A', 'R', 'E']);
+    say((await melt(page)).on === false, 'right letters should not melt him');
+    // a wrong letter: the sun flares, heat rises and he slumps to the next stage, then the plain snowman is back
+    await tap(p, 'X');
+    const beat = await melt(page);
+    say(beat.on && beat.aside, `a wrong guess should play the melt beat in the plain snowman's place, got ${JSON.stringify(beat)}`);
+    say(beat.flare && Number(beat.sunScale) > 1, `the sun should flare on a wrong guess, got ${JSON.stringify(beat)}`);
+    say(/^snowman-[01]$/.test(beat.body ?? ''), `the beat should start from the stage he was at, got ${beat.body}`);
+    say(/snowman-1\.webp$/.test(await snowmanSrc(page)), 'the plain snowman should take the new stage at once, behind the beat');
+    say(await page.locator('.pp-key:text-is("X")').isDisabled(), 'a wrong key should be switched off at once, while the beat plays');
+    await page.waitForTimeout(250);
+    say((await melt(page)).bits > 0, 'heat should rise during the beat');
+    await p.shot('4a-miss-beat');
+    await page.waitForFunction(() => document.querySelector('.pp-melt').hidden, null, { timeout: 4000 });
+    const afterBeat = await melt(page);
+    say(!afterBeat.aside && !afterBeat.flare && afterBeat.sunScale === '', `the plain snowman and the sun should be back after the beat, got ${JSON.stringify(afterBeat)}`);
     say(/snowman-1\.webp$/.test(await snowmanSrc(page)), 'one miss of six should show stage 1');
+    say(/a little worried\. 5 misses left/.test(await page.locator('#snowman').getAttribute('alt')), 'the snowman should still be described after the beat');
     await p.shot('4-play');
     say((await saved(page)).round.guessed.join('') === 'AREX', 'every guess should be saved');
     await guessAll(p, ['P', 'O', 'L', 'B']);
@@ -209,10 +248,36 @@ for (const [w, h] of SIZES) {
     await page.getByRole('button', { name: "It's me" }).click();
     say((await page.locator('.pp-notch').count()) === 4, 'a Hard round should have four notches on the thermometer');
     say((await page.locator('#category').textContent()) === 'Pet', 'a custom category should show on the sign');
+    // three wrong letters tapped quickly, each one cutting the last beat short: nothing may be left half done
     await guessAll(p, ['X', 'Q', 'Z']);
+    await page.waitForFunction(() => document.querySelector('.pp-melt').hidden, null, { timeout: 4000 });
+    const quick = await melt(page);
+    say(!quick.aside && !quick.flare && quick.sunScale === '', `quick wrong taps should leave the plain snowman standing, got ${JSON.stringify(quick)}`);
+    say(/snowman-6\.webp$/.test(await snowmanSrc(page)), 'three misses of four should show stage 6');
+    say(/1 miss left/.test(await page.locator('#snowman').getAttribute('alt')), 'three misses of four should leave one');
+    say((await saved(page)).round.guessed.join('') === 'XQZ', 'every quick tap should be saved once');
     await p.shot('6-one-miss-left');
-    await guessAll(p, ['W']);
+
+    // the last miss: he melts out from under his hat, which hangs, then drops into the puddle
+    const lostAt = Date.now();
+    await tap(p, 'W');
+    say((await resultShown(page)) === false, 'the result should wait for the melt');
+    say((await page.locator('.pp-key:not(:disabled)').count()) === 0, 'no key should work once the round is lost');
+    await page.waitForTimeout(700);
+    const hanging = await melt(page);
+    say(hanging.on && hanging.body === 'puddle' && hanging.hat === 'hat-6', `from stage 6 his own hat should be left hanging over the puddle, got ${JSON.stringify(hanging)}`);
+    say((await resultShown(page)) === false, 'the result should still be waiting while the hat hangs');
+    await p.shot('6b-hat-left-hanging');
+    await page.locator('#result').waitFor({ state: 'visible', timeout: 5000 });
+    const took = Date.now() - lostAt;
+    say(took >= 2000 && took <= 3600, `the melt should take two to three seconds before the result, took ${took} ms`);
+    const atRest = await melt(page);
+    say(atRest.on && atRest.aside && atRest.body === 'puddle' && atRest.hat === 'puddle-hat', `a lost round should end as the puddle with the hat floating on it, got ${JSON.stringify(atRest)}`);
+    say(atRest.hatTop > hanging.hatTop, 'the hat should have come down from where it hung');
+    say(atRest.eyes.length === 1 && atRest.bits === 0 && !atRest.flare, `the puddle at rest should have its eyes and nothing in the air, got ${JSON.stringify(atRest)}`);
+    say(await page.evaluate(() => document.activeElement?.classList.contains('pp-headline')), 'the loss heading should take the focus when it comes up');
     say(/snowman-8\.webp$/.test(await snowmanSrc(page)), 'a lost round should end on the puddle');
+    say((await page.locator('#snowman').getAttribute('alt')) === 'The snowman is a puddle.', 'the puddle should still be described for screen readers');
     const heading = await page.locator('.pp-headline').textContent();
     say(LOSS_HEADINGS.includes(heading), `a loss heading should be one of the seven, got "${heading}"`);
     say(/No point/.test(await page.locator('.pp-note').textContent()), 'a loss should say there is no point');
@@ -222,8 +287,20 @@ for (const [w, h] of SIZES) {
     await p.shot('7-result-loss');
     await fits(p, 'loss', { playScreen: true });
     say((await page.locator('.pp-cel').isVisible()) === false, 'a lost round should not be celebrated');
-    say((await page.locator('#snowman.away').count()) === 0, 'a lost round should show the plain snowman');
+    // the eyes blink up at you
+    await page.waitForFunction(() => [...document.querySelectorAll('.pp-melt-actor img')].some((i) => i.dataset.piece === 'puddle-eyes-closed' && !i.hidden), null, { timeout: 6000 });
+    // a refresh on a lost round shows how it ended, without playing the melt again
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForTimeout(300);
+    say((await resultShown(page)) === true, 'refreshing on a lost result should keep it, with no wait');
+    say((await page.locator('.pp-headline').textContent()) === heading, 'the loss heading should survive a refresh');
+    const reloaded = await melt(page);
+    say(reloaded.on && reloaded.body === 'puddle' && reloaded.hat === 'puddle-hat' && reloaded.bits === 0, `a refresh on a lost round should show the puddle at rest, not play the melt again, got ${JSON.stringify(reloaded)}`);
+    say((await page.locator('#snowman').getAttribute('alt')) === 'The snowman is a puddle.', 'the puddle should still be described after a refresh');
+    await p.shot('7b-loss-after-refresh');
+    await fits(p, 'loss after refresh', { playScreen: true });
     await page.getByRole('button', { name: 'Next round' }).click();
+    say((await melt(page).catch(() => null)) === null, 'the melt should go away with the play screen');
 
     // Dad sets again: Normal was his last choice; then a refresh in the middle of his guessing round
     say((await text(page)).includes('Dad, type a secret.'), 'roles should swap back');
@@ -240,6 +317,7 @@ for (const [w, h] of SIZES) {
     await page.waitForTimeout(400);
     const after = { answer: await page.locator('#answer').getAttribute('aria-label'), src: await snowmanSrc(page), alt: await page.locator('#snowman').getAttribute('alt') };
     say(JSON.stringify(before) === JSON.stringify(after), `a refresh mid-round should come back exactly: ${JSON.stringify(before)} then ${JSON.stringify(after)}`);
+    say((await melt(page)).on === false, 'a refresh mid-round should not replay the beat');
     say((await page.locator('.pp-key.hit').allTextContents()).join('') === 'S', 'the right key should still be marked after a refresh');
     say((await page.locator('.pp-key.miss').allTextContents()).join('') === 'X', 'the wrong key should still be marked after a refresh');
     await p.shot('8-after-refresh');
@@ -286,7 +364,18 @@ for (const [w, h] of SIZES) {
     await setSecret(p, { answer: 'Ice', category: 'Food', difficulty: 'Easy' });
     await page.getByRole('button', { name: "It's me" }).click();
     say((await page.locator('.pp-notch').count()) === 8, 'an Easy round should have eight notches');
-    await guessAll(p, ['X', 'Q', 'Z', 'W', 'J', 'K', 'V', 'B']);
+    await guessAll(p, ['X', 'Q', 'Z', 'W', 'J', 'K', 'V']);
+    // the eighth miss loses it; a tap on the yard skips the melt
+    await tap(p, 'B');
+    await page.waitForTimeout(500);
+    const playing = await melt(page);
+    say(playing.on && playing.hat === 'hat-7' && (await resultShown(page)) === false, `the tap on the last wrong key should start the melt, not skip it, got ${JSON.stringify(playing)}`);
+    const yard = await page.locator('#scene').boundingBox();
+    await page.mouse.click(yard.x + yard.width / 2, yard.y + yard.height / 3);
+    await page.waitForTimeout(250);
+    say((await resultShown(page)) === true, 'a tap should skip the melt and bring up the result');
+    const skipped = await melt(page);
+    say(skipped.body === 'puddle' && skipped.hat === 'puddle-hat' && skipped.bits === 0, `a skipped melt should jump to the puddle at rest, got ${JSON.stringify(skipped)}`);
     say(/See who won/.test(await page.locator('#next').textContent()), 'the last round of a match should say who won next');
     await page.getByRole('button', { name: 'See who won' }).click();
     say((await text(page)).includes('Sam wins!'), 'Sam solved one and Dad none, so Sam wins');
@@ -298,6 +387,29 @@ for (const [w, h] of SIZES) {
     await page.getByRole('button', { name: 'Rematch' }).click();
     say((await text(page)).includes('Dad, type a secret.'), 'a rematch should start with the first player');
     say((await tags(page))[0].startsWith('DAD 0') && (await tags(page))[1].startsWith('SAM 0'), 'a rematch should reset the score');
+    await p.context.close();
+  }
+
+  // ===== a phone that asks for reduced motion: the story beats, no big motion =====
+  {
+    const p = await newPhone(w, h, 'reduced motion', { reducedMotion: 'reduce' });
+    const { page, say } = p;
+    await enterNames(p, 'Dad', 'Sam');
+    await setSecret(p, { answer: 'Cat', category: 'Animal', difficulty: 'Hard' });
+    await page.getByRole('button', { name: "It's me" }).click();
+    await tap(p, 'X');
+    const miss = await melt(page);
+    say(!miss.on && !miss.aside && !miss.flare, `with reduced motion a wrong guess should show no beat, got ${JSON.stringify(miss)}`);
+    say(/snowman-2\.webp$/.test(await snowmanSrc(page)), 'with reduced motion a wrong guess should still show the next stage at once');
+    for (const ch of ['Q', 'Z', 'W']) await tap(p, ch);
+    await page.waitForTimeout(200);
+    say((await resultShown(page)) === true, 'with reduced motion the result should come up without waiting for a melt');
+    const still = await melt(page);
+    say(still.on && still.body === 'puddle' && still.hat === 'puddle-hat' && still.bits === 0, `with reduced motion a lost round should show the puddle at rest, got ${JSON.stringify(still)}`);
+    await page.waitForTimeout(800);
+    const later = await melt(page);
+    say(later.hatTop === still.hatTop && later.hatTurn === '0' && later.eyes.join() === 'puddle-eyes', `with reduced motion the puddle should hold still, got ${JSON.stringify(later)}`);
+    await p.shot('14-reduced-motion-loss');
     await p.context.close();
   }
 

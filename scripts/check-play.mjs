@@ -63,7 +63,11 @@ for (const ch of ['T', 'X', 'Q', 'Z', 'W']) {
   await page.keyboard.press(ch);
   await page.waitForTimeout(500);
 }
-await page.waitForTimeout(800);
+// the melt plays before the result comes up; Escape skips it
+const waiting = await read();
+expect(!waiting.resultShown, 'the result should wait for the melt after the last miss');
+await page.keyboard.press('Escape');
+await page.waitForTimeout(300);
 const end = await read();
 if (shots) await page.screenshot({ path: `${shots}/paper-polar-lost.png` });
 expect(/snowman-8\.webp$/.test(end.snowman), `a lost round should show the puddle, got ${end.snowman}`);
