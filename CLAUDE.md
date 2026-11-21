@@ -14,7 +14,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 - The answer limit is 45 characters (engine, sign and checks). At the limit, letters are 22 px at Drew's phone size (440x956).
 - The four engine calls are confirmed (`BRIEF.md`, 2026-11-20).
 
-**Now: art round 4, which Drew is running** (agreed 2026-11-20). Prompts in `art/prompts/round-4-stage-3-and-win.md`: melt stage 3 redrawn (keeping the waving arm), and two win-celebration options (a backflip, a little dance) for Drew to pick from, plus an optional cloud and snowflakes. Drew saves his picks in `art/layers/originals/` as `snowman-3-redraw.png`, `win-backflip.png`, `win-dance.png` and `win-sky.png`, which are already in `SHEETS` in `scripts/cut-art.mjs` (the redraw replaces stage 3 when present). He may cut and push them himself from the Mac. Then show him a lineup of stages 2 to 4 and the two celebrations side by side.
+**Now: art round 4, which Drew is running** (agreed 2026-11-20). Prompts in `art/prompts/round-4-stage-3-and-win.md`: melt stage 3 redrawn (keeping the waving arm), and two win-celebration options (a backflip, a little dance) for Drew to pick from, plus an optional cloud and snowflakes. Drew saves his picks in `art/layers/originals/` as `snowman-3-redraw.png`, `win-backflip.png`, `win-dance.png` and `win-sky.png`, which are already in `SHEETS` in `scripts/cut-art.mjs` (the redraw replaces stage 3 when present). He generated and saved all four on his Mac on 2026-11-21. A local session on the Mac cuts and pushes them, because cloud sessions only see what is on GitHub. Then show him a lineup of stages 2 to 4 and the two celebrations side by side (`node scripts/lineup.mjs`).
 
 **Step 2, make it playable: built and pushed to `dev` on 2026-11-21; waiting for Drew to play it on his phone.** It ran in its own cloud session alongside art round 4. While both ran they split the files (this session: `index.html`, `src/` except the manifest, `scripts/check-*.mjs`, tests; the art round: `art/`, `public/art/`, the manifest, `cut-art.mjs`). That split ends when Step 2 is approved; fetch and merge `origin/dev` before every push regardless.
 
@@ -100,7 +100,7 @@ The site is served under `/meltdown/` in development too, to match `https://drew
 | `art/prompts/` | Every image prompt, with which model, settings and reference images. |
 | `art/concepts/` | Mock-ups from the direction rounds. Reference only; they never ship. |
 | `docs/phase-1/` | Screenshots shown to Drew at check-ins. |
-| `scripts/` | `cut-art.mjs`, `shot.mjs`, `check-play.mjs`, `check-sign.mjs`, `check-game.mjs`, `use-chromium.mjs`. |
+| `scripts/` | `cut-art.mjs`, `lineup.mjs` (cut pieces side by side on one baseline), `shot.mjs`, `check-play.mjs`, `check-sign.mjs`, `check-game.mjs`, `use-chromium.mjs`. |
 
 ## How the art is made
 
