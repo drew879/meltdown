@@ -217,8 +217,12 @@ export const LOSS_MS = 2300;
 const DROP = FLARE_MS;
 const FALL = 1500;
 const LAND = 1730;
-/** How far above his head the hat jumps and hangs. */
-const HANG = 0.3 * FULL;
+/**
+ * How high the middle of the hat hangs, whichever stage it came off: well clear of the puddle, and
+ * low enough to stay out of the sun, which is at its biggest by now (on a 320 px phone it reaches
+ * most of the way down the sky).
+ */
+const HANG_Y = 0.6 * FULL;
 
 /** The puddle at rest: the hat floats and bobs, the carrot bobs, the eyes blink. `t` is the time at rest; null is the still picture. */
 export function restFrame(t: number | null): MeltFrame {
@@ -242,7 +246,7 @@ function splash(f: MeltFrame, t: number, at: number, n: number, spread: number, 
       y0: 0.05 * FULL,
       vx: a * 0.55 * FULL * spread,
       vy: (0.9 + 0.45 * (1 - Math.abs(a))) * FULL * power,
-      size: (0.075 + 0.025 * (i % 2)) * FULL,
+      size: (0.06 + 0.02 * (i % 2)) * FULL,
       spin: a * 160,
     });
     if (drop) f.particles.push(drop);
@@ -271,12 +275,12 @@ export function lossFrame(from: number, t: number): MeltFrame {
   const on = HAT_ON[piece];
 
   if (t < FALL) {
-    // the hat jumps up off him in surprise and hangs there, well clear of the puddle, then looks down
-    const up = held(t, [
-      [DROP, 0.12 * FULL],
-      [DROP + 100, 0.26 * FULL],
-      [DROP + 200, HANG + 0.03 * FULL],
-      [DROP + 300, HANG],
+    // the hat jumps up off him in surprise, across to above where it will land, and hangs there; then it looks down
+    const [across, up] = held(t, [
+      [DROP, [0.3, 0.4]],
+      [DROP + 100, [0.7, 0.85]],
+      [DROP + 200, [1, 1.1]],
+      [DROP + 300, [1, 1]],
     ] as const);
     const look = held(t, [
       [DROP, 0],
@@ -285,7 +289,7 @@ export function lossFrame(from: number, t: number): MeltFrame {
       [1200, -4],
       [1320, 0],
     ] as const);
-    f.hat = { piece, x: on.x, y: on.y + up, rot: look, sy: 1 };
+    f.hat = { piece, x: on.x + (REST.hat.x - on.x) * across, y: on.y + (HANG_Y - on.y) * up, rot: look, sy: 1 };
     // the eyes squeeze shut at the splat, open, look up at the hat and blink once
     if ((t >= DROP && t < DROP + 300) || (t >= 1080 && t < 1200)) f.eyes = 'closed';
     return f;
@@ -297,7 +301,7 @@ export function lossFrame(from: number, t: number): MeltFrame {
       [FALL + 80, 0.35],
       [FALL + 160, 0.68],
     ] as const);
-    f.hat = { piece, x: on.x + (REST.hat.x - on.x) * p, y: on.y + HANG + (REST.hat.y - on.y - HANG) * p, rot: p * 14, sy: 1 };
+    f.hat = { piece, x: REST.hat.x, y: HANG_Y + (REST.hat.y - HANG_Y) * p, rot: p * 14, sy: 1 };
     return f;
   }
   // plop: the hat lands with a squash, water flies, the carrot bobs and the eyes flinch

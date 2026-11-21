@@ -121,11 +121,13 @@ describe('the last wrong guess', () => {
       const on = HAT_ON[hatOf(from)];
       const first = lossFrame(from, 360);
       expect(first.body).toBe('puddle');
-      expect(first.hat).toMatchObject({ piece: hatOf(from), x: on.x });
+      expect(first.hat!.piece).toBe(hatOf(from));
       expect(first.hat!.y).toBeGreaterThan(on.y); // it jumps in the same frame, so a new drawing of the hat never has to match pixel for pixel
+      expect(Math.hypot(first.hat!.x - on.x, first.hat!.y - on.y)).toBeLessThan(0.15 * FULL); // but it starts near where it sat
       const hanging = lossFrame(from, 1300).hat!;
       expect(hanging.piece).toBe(hatOf(from));
       expect(hanging.y - REST.hat.y).toBeGreaterThan(0.25 * FULL);
+      expect(hanging.x).toBe(REST.hat.x); // above where it will land, so it drops straight down
     }
   });
 
@@ -136,6 +138,7 @@ describe('the last wrong guess', () => {
         const hat = lossFrame(from, t).hat!;
         expect(hat.y).toBeLessThanOrEqual(last);
         expect(hat.y).toBeGreaterThanOrEqual(REST.hat.y);
+        expect(hat.x).toBe(REST.hat.x);
         last = hat.y;
       }
       expect(lossFrame(from, LOSS_MS - 1).hat).toEqual({ piece: 'puddle-hat', x: REST.hat.x, y: REST.hat.y, rot: 0, sy: 1 });

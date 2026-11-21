@@ -1,0 +1,71 @@
+/* The melt, drawn over the play screen's scene (see melt.ts): the beat on a
+   wrong guess and the loss. Pieces sit at the top left of their box and are
+   moved with transforms, so a frame costs no layout. */
+
+.pp-melt {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.pp-melt[hidden],
+.pp-melt [hidden],
+.pp-melt-flare[hidden] {
+  display: none;
+}
+.pp-melt img,
+.pp-melt-flare {
+  display: block;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* the ring of rays that bursts behind the sun: it sits before the sun in the scene, so the sun covers its middle */
+.pp-melt-flare {
+  position: absolute;
+  left: 0;
+  top: 0;
+  filter: drop-shadow(0 3px 3px rgba(150, 80, 20, 0.35));
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* the snowman: a zero-size anchor at the middle of his feet */
+.pp-melt-actor {
+  position: absolute;
+  width: 0;
+  height: 0;
+  filter: drop-shadow(0 5px 4px rgba(40, 50, 15, 0.38));
+}
+/* a melt stage or the puddle: squashed and stretched from the ground */
+.pp-melt-body {
+  transform-origin: 50% 100%;
+}
+.pp-melt-actor img {
+  position: absolute;
+  will-change: transform;
+}
+.pp-melt-hat {
+  transform-origin: 50% 85%;
+}
+
+/* heat behind him, drops in front */
+.pp-melt-bits {
+  position: absolute;
+  inset: 0;
+}
+.pp-melt-bits img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  filter: drop-shadow(0 2px 1px rgba(30, 60, 80, 0.28));
+  will-change: transform;
+}
+
+/* while the melt stands in for him, the plain snowman is faded out, not removed,
+   so screen readers still read his description */
+.pp-snowman.aside {
+  opacity: 0;
+  animation: none;
+}

@@ -20,6 +20,7 @@ import { lossHeading, roundSeed, WIN_HEADING } from '../app/copy';
 import { renderHeader } from '../app/header';
 import { art, manifest, snowmanPiece, type Piece } from './art';
 import { createCelebration } from './celebration';
+import { createMelt } from './melt';
 import { fitAnswer } from './sign-fit';
 import { placeYard } from './yard';
 
@@ -59,7 +60,7 @@ const STAGE_WORDS = [
 
 type Mood = 'smug' | 'gleeful' | 'annoyed' | 'dismayed';
 
-/** How long the keys stay on screen after the last guess, so the final move is seen. */
+/** How long the keys stay on screen after the last guess, so the final move is seen. (A loss waits for its melt instead.) */
 const RESULT_DELAY_MS = 1000;
 
 // the post, and the flowers, snow and grass at the foot of the sign
@@ -86,6 +87,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
   const snowman = el('img', { class: 'pp-snowman', id: 'snowman', alt: '' });
   const scene = el('section', { class: 'pp-scene', id: 'scene' }, sun, thermo, snowman);
   const celebration = createCelebration(scene, snowman);
+  const melt = createMelt(scene, snowman, sun, !reduceMotion);
   const answerEl = el('div', { class: 'pp-answer', id: 'answer', role: 'img' });
   const board = el('div', { class: 'pp-board', id: 'board' }, answerEl);
   const category = el('div', { class: 'pp-category', id: 'category' });
@@ -122,6 +124,18 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     if (phase === 'play') deps.onGuess(e.key.toUpperCase());
   };
   addEventListener('keydown', onKeydown);
+  // The melt at the end of a lost round can be skipped with a tap anywhere but the name tags, or with
+  // Enter, Space or Escape. It listens for the press, not the click, so the tap on the last wrong key
+  // (whose click is what starts the melt) can never skip it.
+  const onSkipPress = (e: PointerEvent) => {
+    if (!header.contains(e.target as Node)) melt.skip();
+  };
+  const onSkipKey = (e: KeyboardEvent) => {
+    if (e.repeat || header.contains(e.target as Node)) return; // a key on the New game button is for that button
+    if ((e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') && melt.skip()) e.preventDefault();
+  };
+  root.addEventListener('pointerdown', onSkipPress);
+  addEventListener('keydown', onSkipKey);
 
   // ---- what is on screen ----
   let phase: GameState['phase'] = 'play';
@@ -131,6 +145,8 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
   let notchesFor = 0;
   let moodTimer = 0;
   let resultTimer = 0;
+  /** Bumped whenever the result's reveal is planned afresh, so an older wait (for a melt that has since been replaced) does nothing. */
+  let resultRun = 0;
   let popLetter: string | undefined;
   let destroyed = false;
 
@@ -227,8 +243,8 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     sun.style.left = `${sunLeft}px`;
     sun.style.top = `${sunTop}px`;
 
-    // the win celebration stands in the same place and at the same scale
-    celebration.layout({
+    // the win celebration and the melt stand in the same place and at the same scale
+    const metrics = {
       width: box.width,
       height: box.height,
       full,
@@ -238,7 +254,9 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       sunX: sunLeft + sunSize / 2,
       sunY: sunTop + sunSize / 2,
       sunSize,
-    });
+    };
+    celebration.layout(metrics);
+    melt.layout(metrics);
 
     // the thermometer
     const tw = Math.max(20, Math.min(30, box.height * 0.08));
@@ -315,7 +333,8 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     }
   }
 
-  function showResult(state: GameState, live: boolean) {
+  /** `after`, when given, is the melt that must play out (or be skipped) before the result comes up. */
+  function showResult(state: GameState, live: boolean, after?: Promise<void>) {
     const solved = outcome() === 'won';
     const guesser = state.players[round!.guesser]!.name;
     headline.textContent = solved ? WIN_HEADING : lossHeading(roundSeed(answer, state.history.length));
@@ -330,7 +349,9 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       if (live) headline.focus({ preventScroll: true }); // screen readers read the result out
     };
     clearTimeout(resultTimer);
-    if (live && !reduceMotion) resultTimer = window.setTimeout(reveal, RESULT_DELAY_MS);
+    const run = ++resultRun;
+    if (after) void after.then(() => !destroyed && run === resultRun && reveal());
+    else if (live && !reduceMotion) resultTimer = window.setTimeout(reveal, RESULT_DELAY_MS);
     else reveal();
   }
 
@@ -351,6 +372,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       phase = state.phase;
       round = state.round;
       if (!round) return;
+      const stageBefore = shownStage; // what he looked like before this guess
       answer = round.puzzle.answer;
       popLetter = event?.status === 'correct' ? event.letter : undefined;
       renderHeader(header, state, deps.onNewGame);
@@ -378,7 +400,23 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       } else {
         setSun(restingMood());
       }
-      const settled = showStage(stage(), !!event);
+      // A wrong guess melts him: a beat down to the next stage, or on the last one the melt into the
+      // puddle. The plain snowman takes the new stage at once, behind the melt, so whatever interrupts
+      // the beat (another guess, a resize, the screen going away) finds him where he should be.
+      const melting = !!event && event.status === 'wrong' && !reduceMotion && stageBefore >= 0;
+      let lossPlayed: Promise<void> | undefined;
+      let settled = Promise.resolve();
+      if (outcome() === 'lost') {
+        void showStage(stage(), false);
+        if (melting) lossPlayed = melt.playLoss(stageBefore);
+        else melt.showRest();
+      } else if (melting && outcome() === 'playing') {
+        void showStage(stage(), false);
+        melt.playMiss(stageBefore, stage());
+      } else {
+        melt.reset();
+        settled = showStage(stage(), !!event);
+      }
       describe();
       layoutScene();
 
@@ -393,7 +431,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
         } else celebration.showRest();
       } else celebration.reset();
 
-      if (phase === 'result') showResult(state, !!event);
+      if (phase === 'result') showResult(state, !!event, lossPlayed);
       else {
         tray.classList.remove('away');
         tray.inert = false;
@@ -403,9 +441,11 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     destroy() {
       destroyed = true;
       removeEventListener('keydown', onKeydown);
+      removeEventListener('keydown', onSkipKey);
       clearTimeout(moodTimer);
       clearTimeout(resultTimer);
       celebration.destroy();
+      melt.destroy();
     },
   };
 
