@@ -14,7 +14,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 - The answer limit is 45 characters (engine, sign and checks). At the limit, letters are 22 px at Drew's phone size (440x956).
 - The four engine calls are confirmed (`BRIEF.md`, 2026-11-20).
 
-**Now: art round 4, which Drew is running** (agreed 2026-11-20). Prompts in `art/prompts/round-4-stage-3-and-win.md`: melt stage 3 redrawn (keeping the waving arm), and two win-celebration options (a backflip, a little dance) for Drew to pick from, plus an optional cloud and snowflakes. When he says they are done, collect them through the Higgsfield connector (`show_generations`) or ask him for the files, save them in `art/layers/originals/`, add them to `SHEETS` in `scripts/cut-art.mjs` (stage 3 is the middle figure of its sheet), run `npm run art`, and show him a lineup of stages 2 to 4.
+**Now: art round 4, which Drew is running** (agreed 2026-11-20). Prompts in `art/prompts/round-4-stage-3-and-win.md`: melt stage 3 redrawn (keeping the waving arm), and two win-celebration options (a backflip, a little dance) for Drew to pick from, plus an optional cloud and snowflakes. Drew saves his picks in `art/layers/originals/` as `snowman-3-redraw.png`, `win-backflip.png`, `win-dance.png` and `win-sky.png`, which are already in `SHEETS` in `scripts/cut-art.mjs` (the redraw replaces stage 3 when present). He may cut and push them himself from the Mac. Then show him a lineup of stages 2 to 4 and the two celebrations side by side.
 
 **In progress: Step 2, make it playable.** Drew asked on 2026-11-21 for it to run in a separate cloud session, alongside art round 4. While both run, they split the files: the Step 2 session owns `index.html`, `src/` (except `src/paper/art-manifest.json`), `scripts/check-*.mjs` and the tests; the art round owns `art/`, `public/art/`, `src/paper/art-manifest.json` and `scripts/cut-art.mjs`. Both push to `dev`, so fetch and merge `origin/dev` before every push, and push only builds that work, because each push goes live.
 
@@ -38,7 +38,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 **Known gaps**
 
 - No iPad layout yet. Screens 320 px wide work but are cramped; a 24-letter single word there gets 9.5 px letters.
-- Art is 1.46 MB. The target is well under 2 MB for the first load, so later melt stages should load after the first screen.
+- Art is 1.46 MB. The target is well under 2 MB for the first load, so later melt stages should load after the first screen. `src/paper/play.ts` preloads every piece in the manifest, so once the round 4 win poses are cut it will also fetch them on every load; preload only what the current screen needs.
 - The first direction (a beach, drawn in code) is still in the repo: `src/art/`, `src/ui/`, `direction/index.html`, `direction/play.html`, `direction/board.*`. It was replaced by the paper look and is not in the build. Delete it once Phase 1 is approved; ask first.
 
 ## How we work

@@ -31,6 +31,16 @@ const SHEETS = [
   { src: 'snowman-4-5-fix.png', order: 'x', join: 14, names: ['snowman-4', 'snowman-5'], hat: true },
   { src: 'snowman-6-7-fix.png', order: 'x', join: 14, names: ['snowman-6', 'snowman-7'], hat: true },
   { src: 'snowman-6-8.png', order: 'x', join: 14, names: [null, null, 'snowman-8'], hat: true },
+  // Round 4 (art/prompts/round-4-stage-3-and-win.md). Stage 3 redrawn between
+  // stages 2 and 4: only the middle figure is used, and when the sheet is
+  // there it replaces the stage 3 cut from snowman-3-5.png above.
+  { src: 'snowman-3-redraw.png', order: 'x', join: 14, names: [null, 'snowman-3', null], hat: true },
+  // Two win celebrations for Drew to choose from, four poses each, read
+  // top left, top right, bottom left, bottom right.
+  { src: 'win-backflip.png', order: 'grid', join: 14, names: ['win-backflip-1', 'win-backflip-2', 'win-backflip-3', 'win-backflip-4'], hat: true },
+  { src: 'win-dance.png', order: 'grid', join: 14, names: ['win-dance-1', 'win-dance-2', 'win-dance-3', 'win-dance-4'], hat: true },
+  // Optional: a cloud to roll over the sun, then six snowflakes.
+  { src: 'win-sky.png', order: 'grid', join: 10, names: ['cloud', 'flake-1', 'flake-2', 'flake-3', 'flake-4', 'flake-5', 'flake-6'], maxSide: 900 },
   { src: 'sun.png', order: 'grid', join: 20, names: ['sun-smug', 'sun-gleeful', 'sun-annoyed', 'sun-dismayed'], maxSide: 460 },
   { src: 'signs.png', order: 'y', join: 12, names: ['sign-1', 'sign-2', 'sign-3'], maxSide: 960, unnail: true },
   {
