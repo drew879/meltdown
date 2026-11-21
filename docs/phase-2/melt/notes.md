@@ -21,7 +21,6 @@ The same shape as the win celebration.
 | `src/paper/melt-timeline.ts` | The melt as pure functions of the time since the guess: `missFrame(from, to, t)`, `lossFrame(from, t)`, `restFrame(t)`. Units are pixels of the cut art (the fresh snowman is 912 tall), from the middle of his feet. Also the piece names (`MELT_PIECES`) and where the loose pieces lie (`REST`, `HAT_ON`). |
 | `src/paper/melt-timeline.test.ts` | 17 tests: every miss at every difficulty starts and ends on the right stage and passes through each one in between; the hat hangs clear of the puddle and drops straight into its place; the loss ends in the puddle at rest; nothing is held for under 40 ms. |
 | `src/paper/melt.ts`, `melt.css` | Draws one frame at a time over the play screen's scene. While it plays, the plain `#snowman` is faded out (class `aside`), not removed, so its alt text is still read. |
-| `src/paper/melt-art.ts` | Where each loose piece comes from: `public/art/` once the manifest has it, otherwise a stand-in from `src/paper/melt-standins/`. |
 | `src/paper/play.ts` | Starts the beat on a wrong guess and the loss on the last one; holds the result back until the loss has played or been skipped. |
 
 Rules it follows:
@@ -41,7 +40,7 @@ Eleven loose pieces, by the names they have in `public/art/` (`art/prompts/round
 - Sheet `melt-puddle.png`: `puddle`, `puddle-hat`, `puddle-carrot`, `puddle-eyes`, `puddle-eyes-closed`, `hat-6`, `hat-7`.
 - Sheet `melt-heat.png`: `sun-flare`, `heat-1`, `heat-2`, `drop`.
 
-Until a piece is cut, the game uses a rough stand-in of the same name from `src/paper/melt-standins/` (cut from the existing stages by `make-standins.mjs`, or a simple drawn shape). **Stand-ins must not go live.** When all eleven real pieces are in the manifest, delete `src/paper/melt-standins/` and the stand-in half of `melt-art.ts`.
+All eleven were generated and cut on 2026-11-21 (commit 6b077ad; the prompts file has the results, including why the puddle's pieces come from three sheets). The game was first built with rough stand-ins cut from the existing stages; they were deleted once the real pieces were in (their cutter is in the history at commit 1b2edb6, `src/paper/melt-standins/make-standins.mjs`). `REST` and `HAT_ON` in `melt-timeline.ts`, the places the pieces lie, were measured from the drawn stages 6, 7 and 8 by that cutter.
 
 The puddle has no eyes drawn on it: the open and closed eyes are two pieces that are swapped, so they never have to line up with a drawing underneath. The drawn stage 8 (`snowman-8`) is still what the plain `#snowman` holds on a lost round, for its alt text, but it is not seen: the puddle and its loose pieces stand in front of it.
 

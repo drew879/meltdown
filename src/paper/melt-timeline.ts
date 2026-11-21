@@ -17,7 +17,7 @@
 // of the middle of his feet and y up from them. melt.ts scales them to the screen.
 import manifest from './art-manifest.json';
 
-/** The loose pieces the melt draws, by the names they have (or will have) in public/art/. */
+/** The loose pieces the melt draws, by their names in public/art/ (art round 7, art/prompts/round-7-melt-pieces.md). */
 export const MELT_PIECES = [
   'puddle',
   'puddle-hat',
@@ -40,17 +40,17 @@ export const FULL = manifest['snowman-0'].h;
 export const stageHeight = (stage: number) => manifest[`snowman-${stage}` as keyof typeof manifest].h;
 
 /**
- * Where the middle of each loose piece lies when the puddle is at rest, as in the drawn stage 8
- * (measured by melt-standins/make-standins.mjs). The puddle is given by its bottom edge.
- * If the real puddle's outline differs, these are the numbers to nudge.
+ * Where the middle of each loose piece lies when the puddle is at rest, measured from the drawn
+ * stage 8, so the pieces lie as they do there. The puddle is given by its bottom edge: like stage 8
+ * it reaches down to the tip of the scarf's fringe, at his feet.
  */
 export const REST = {
-  puddle: { x: 0, bottom: 8 },
+  puddle: { x: 0, bottom: 0 },
   hat: { x: 53.5, y: 285.5 },
   carrot: { x: -127, y: 142.5 },
   eyes: { x: -76, y: 196.5 },
 } as const;
-/** Where the middle of the hat sits on stages 6 and 7, the two stages a round can be lost from. */
+/** Where the middle of the hat sits on stages 6 and 7 (measured from those pictures), the two stages a round can be lost from. */
 export const HAT_ON = {
   'hat-6': { x: -70.5, y: 383 },
   'hat-7': { x: -58, y: 284.5 },

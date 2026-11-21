@@ -12,7 +12,6 @@
 import './melt.css';
 import { art, manifest, snowmanPiece } from './art';
 import type { SceneMetrics } from './celebration';
-import { meltPiece } from './melt-art';
 import {
   LOSS_MS,
   MELT_PIECES,
@@ -47,7 +46,7 @@ type Mode = 'idle' | 'miss' | 'loss' | 'rest';
 const STAGES = [0, 1, 2, 3, 4, 5, 6, 7];
 const HATS: HatPiece[] = ['hat-6', 'hat-7', 'puddle-hat'];
 
-/** `piece` names the picture for the browser checks: a stand-in's address says nothing about what it is. */
+/** `piece` names the picture, for the browser checks. */
 function img(src: string, piece: string, className = ''): HTMLImageElement {
   const el = new Image();
   el.alt = '';
@@ -63,7 +62,8 @@ function img(src: string, piece: string, className = ''): HTMLImageElement {
  */
 export function createMelt(scene: HTMLElement, snowman: HTMLImageElement, sun: HTMLImageElement, animateRest: boolean): Melt {
   // ---- the pieces ----
-  const pieces = Object.fromEntries(MELT_PIECES.map((name) => [name, meltPiece(name)])) as Record<MeltPiece, ReturnType<typeof meltPiece>>;
+  // each loose piece's address and its size in the cut art's pixels
+  const pieces = Object.fromEntries(MELT_PIECES.map((name) => [name, { src: art(name), ...manifest[name] }])) as Record<MeltPiece, { src: string; w: number; h: number }>;
   // Every picture is a direct child of the actor and is moved by its own transform: WebKit does not
   // paint pictures nested in a second zero-size box inside the actor's drop shadow.
   const bodies = new Map<number | 'puddle', HTMLImageElement>();
