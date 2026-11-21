@@ -273,6 +273,7 @@ Drew wanted a live version to play and iterate on sooner. These take precedence 
 - **Win celebration:** two options are generated in the same round, a backflip and a little dance, four stop-motion poses each. Drew picks one.
 - **The sign** has no nail heads at its ends, since nothing behind them would hold a nail. The cutting script paints them out.
 - **Drew runs the generations himself** on higgsfield.ai, from the prompts in `art/prompts/round-4-stage-3-and-win.md`.
+- **Home Screen icon applied:** the nervous-face tile Drew chose on 2026-11-19 (top left of round 2's icon sheet), as drawn. Its corners are filled out to a full square because iOS rounds them itself. Wired in with a 32 px favicon and a basic web app manifest; offline play and the update prompt stay in Phase 5.
 
 ## Decisions from Step 2, making it playable (2026-11-21)
 

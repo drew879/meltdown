@@ -13,6 +13,8 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 - Live now (once the Step 2 push deploys): the whole game, playable on one phone. Names and match length, setup, handoff, play, result and match over, all driven by the engine and saved after every action. Nothing has been on a real phone yet except the earlier stand-in screen. The demo link `?a=Polar Bear&c=Animal&limit=6&g=ARE` still shows a round without saving (built with the real engine).
 - The answer limit is 45 characters (engine, sign and checks). At the limit, letters are 22 px at Drew's phone size (440x956).
 - The four engine calls are confirmed (`BRIEF.md`, 2026-11-20).
+- **Home Screen icon: done (2026-11-20, local session on the Mac).** It is the nervous-face tile Drew chose from the round 2 sheet (top left of `art/concepts/round-2/5-app-icons.jpg`), used as drawn, not redrawn. `index.html` links `apple-touch-icon.png` (180 px), a 32 px favicon and `manifest.webmanifest` (name, standalone, theme colours, icons). Preview with the iOS corner mask: `docs/icon/home-screen-preview.png`. Not yet seen on Drew's phone: iOS caches the icon when a page is added, so he needs to remove any old Home Screen shortcut and add the page again. The manifest is a basic one; offline play and the update prompt are still Phase 5.
+- **Known, not mine to fix here:** `check-game` fails in local WebKit with "focus should go back to the New game button" after tapping Keep playing, at all three widths. It fails the same with the icon change removed. It may be a real WebKit focus gap, so worth a look; Chromium is not installed on the Mac, so the Chromium run was not tried here.
 
 **Now: art round 4, which Drew is running** (agreed 2026-11-20). Prompts in `art/prompts/round-4-stage-3-and-win.md`: melt stage 3 redrawn (keeping the waving arm), and two win-celebration options (a backflip, a little dance) for Drew to pick from, plus an optional cloud and snowflakes. Drew saves his picks in `art/layers/originals/` as `snowman-3-redraw.png`, `win-backflip.png`, `win-dance.png` and `win-sky.png`, which are already in `SHEETS` in `scripts/cut-art.mjs` (the redraw replaces stage 3 when present). He generated and saved all four on his Mac on 2026-11-21. A local session on the Mac cuts and pushes them, because cloud sessions only see what is on GitHub. Then show him a lineup of stages 2 to 4 and the two celebrations side by side (`node scripts/lineup.mjs`).
 
@@ -33,7 +35,7 @@ Read `BRIEF.md` before doing anything. It is the source of truth: the original b
 - First real-phone look (2026-11-20): the live page loads and looks good on Drew's iPhone.
 - **Melt stage 3 runs backwards** (being redrawn in round 4). Drew saw the snowman get taller going into the arm-lift pose. Stage 3 came from a different sheet (`snowman-3-5.png`): its hat sits above stage 2's (786 vs 780 px), and it is slimmer and more upright with a waving arm. Shrinking it to 94% fixes the height but leaves a smaller hat and a slimmer body, so 3 to 4 then looks like widening; see `docs/phase-1/11-melt-stage-3.jpg`. Drew chose a redraw (not the shrink), in the same round as the win poses.
 
-**After Step 2:** Phase 2 animation (melt beats, the win celebration with new poses, the loss sequence), designed versions of the new screens (mock-up options first), Phase 4 audio, the rest of Phase 5 (icon, offline play, update prompt, README, moving the live site to `main`), and Phase 6 QA.
+**After Step 2:** Phase 2 animation (melt beats, the win celebration with new poses, the loss sequence), designed versions of the new screens (mock-up options first), Phase 4 audio, the rest of Phase 5 (offline play, update prompt, README, moving the live site to `main`), and Phase 6 QA.
 
 **Phase 3 engine:** built on Sonnet, reviewed on Fable and pushed (2026-11-19). Pure, UI-free TypeScript in `src/engine/` with 89 Vitest tests (`npm test`). Import everything from `src/engine/index.ts`; the flow is `reduce(state, action)` in `flow.ts`, saving is `createSaveStore` in `save.ts`. Not wired into any screen yet. The match rules are in `match.ts`.
 
@@ -74,6 +76,7 @@ When another session's work is reviewed, the reviewer runs its tests and also wr
 npm run dev      # dev server on the local network, http://localhost:5173/meltdown/
 npm run check    # type-check, tap through a round, fit-test the sign, and play whole games (needs the dev server running)
 npm run art      # cut the generated sheets into the pieces in public/art/
+npm run icon     # resize art/icon/icon-master.png into the Home Screen icon files in public/
 npm run build    # type-check and build
 npm test         # engine unit tests (Vitest)
 ```
@@ -96,11 +99,13 @@ The site is served under `/meltdown/` in development too, to match `https://drew
 | `src/paper/paper.css` | The paper look: name tags, sign, keys, tray, thermometer. |
 | `src/paper/art-manifest.json` | Sizes of the cut pieces. Written by `npm run art`; do not edit by hand. |
 | `public/art/` | The cut pieces the game loads (WebP). Written by `npm run art`. |
+| `public/apple-touch-icon.png`, `icon-192.png`, `icon-512.png`, `favicon-32.png`, `manifest.webmanifest` | The Home Screen icon and web app manifest. The PNGs are written by `npm run icon`. |
+| `art/icon/icon-master.png` | The icon at full size, square with no transparency. Cut from the round 2 concept sheet with `node scripts/make-icon.mjs --from-sheet` (needs that local original). |
 | `art/layers/originals/` | Full-size generated sheets, stored with Git LFS. |
 | `art/prompts/` | Every image prompt, with which model, settings and reference images. |
 | `art/concepts/` | Mock-ups from the direction rounds. Reference only; they never ship. |
 | `docs/phase-1/` | Screenshots shown to Drew at check-ins. |
-| `scripts/` | `cut-art.mjs`, `lineup.mjs` (cut pieces side by side on one baseline), `shot.mjs`, `check-play.mjs`, `check-sign.mjs`, `check-game.mjs`, `use-chromium.mjs`. |
+| `scripts/` | `cut-art.mjs`, `make-icon.mjs`, `lineup.mjs` (cut pieces side by side on one baseline), `shot.mjs`, `check-play.mjs`, `check-sign.mjs`, `check-game.mjs`, `use-chromium.mjs`. |
 
 ## How the art is made
 
