@@ -23,10 +23,10 @@ Piece names, in the order the cutter finds them (`order: 'grid'`: rows top to bo
 
 | # | Name | What it is | Size it must come out at, in cut pixels |
 | --- | --- | --- | --- |
-| 1 | `puddle` | the bare puddle with its scarf; no hat, carrot or eyes | about 615 wide and 285 tall (stage 8 is 615 wide; its puddle and scarf fill the lower 285 px) |
+| 1 | `puddle` | the bare puddle with its scarf; no hat, carrot or eyes | about 600 wide and 260 tall (stage 8 is 615 wide; its puddle and scarf fill the lower 260 px) |
 | 2 | `puddle-hat` | the hat lying in the puddle | about 250 x 177, as in stage 8 |
 | 3 | `puddle-carrot` | the carrot lying in the puddle | about 129 x 75, as in stage 8 |
-| 4 | `puddle-eyes` | the two open eyes, touching, as one piece | about 147 x 75, as in stage 8 |
+| 4 | `puddle-eyes` | the two open eyes, touching, as one piece | about 149 x 79, as in stage 8 |
 | 5 | `puddle-eyes-closed` | the same eyes closed | the same size as `puddle-eyes` |
 | 6 | `hat-6` | stage 6's hat, alone | about 239 x 212, as on `snowman-6` |
 | 7 | `hat-7` | stage 7's hat, alone | about 224 x 193, as on `snowman-7` |
@@ -35,7 +35,7 @@ How they must line up with the existing art:
 
 - **One scale for the whole sheet, the melt's own.** Every melt stage is cut so that the fresh snowman stands 912 px tall. The sizes in the table are what the stand-ins measure at that scale (`src/paper/melt-standins/standins.json`); a piece within about 5% is fine.
 - **`hat-6` and `hat-7` must match the hats on `snowman-6` and `snowman-7`:** the same size and the same tilt (both lean to the left, brim low on the left). On the last miss the picture changes from the stage, with its hat on, to the puddle with the loose hat hanging where the stage's hat was, so a hat of a different size or tilt would jump. The hat pops up in the same frame, so it does not have to match pixel for pixel.
-- **`puddle` must match stage 8's puddle** in outline, width and scarf, because it takes stage 8's place whenever a lost round is on screen. `puddle-hat`, `puddle-carrot` and `puddle-eyes` are laid on it by the game at the places they have in stage 8 (the offsets are `REST` in `src/paper/melt.ts`); check the rest frame against `public/art/snowman-8.webp` and nudge the offsets if the new puddle's outline differs.
+- **`puddle` must match stage 8's puddle** in outline, width and scarf, because it takes stage 8's place whenever a lost round is on screen. `puddle-hat`, `puddle-carrot` and `puddle-eyes` are laid on it by the game at the places they have in stage 8 (the offsets are `REST` in `src/paper/melt-timeline.ts`, in cut pixels from the middle of his feet); check the rest frame against `public/art/snowman-8.webp` and nudge the offsets if the new puddle's outline differs.
 - **The two eye pieces are swapped, not overlaid,** so they only need to be the same size as each other. They must each come out as one piece: if the eyes do not touch, raise `join` for this sheet until the pair counts as one, without merging neighbours.
 - Each eye piece and the puddle is cut on its own, so nothing on the sheet has to sit at any particular spot; only the order (two rows: three pieces, then four) matters.
 
