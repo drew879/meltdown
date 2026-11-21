@@ -131,7 +131,9 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     if (!header.contains(e.target as Node)) melt.skip();
   };
   const onSkipKey = (e: KeyboardEvent) => {
-    if (e.repeat || header.contains(e.target as Node)) return; // a key on the New game button is for that button
+    // a key on the New game button, or on the confirmation or a notice over the screen, is for that button
+    const target = e.target as Node;
+    if (e.repeat || header.contains(target) || (target !== document.body && !root.contains(target))) return;
     if ((e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') && melt.skip()) e.preventDefault();
   };
   root.addEventListener('pointerdown', onSkipPress);
