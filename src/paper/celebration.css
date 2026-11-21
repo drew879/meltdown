@@ -1,0 +1,58 @@
+/* The win celebration, drawn over the play screen's scene (see celebration.ts).
+   Pieces sit at the top left of their box and are moved with transforms, so a
+   frame costs no layout. */
+
+.pp-cel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.pp-cel[hidden],
+.pp-cel [hidden] {
+  display: none;
+}
+.pp-cel img {
+  display: block;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.pp-cel-cloud,
+.pp-cel-flake {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform;
+}
+.pp-cel-cloud {
+  filter: drop-shadow(0 5px 5px rgba(30, 60, 80, 0.3));
+}
+.pp-cel-flake {
+  filter: drop-shadow(0 2px 2px rgba(30, 60, 80, 0.3));
+}
+
+/* the snowman: a zero-size anchor at his feet, so squash and spin start from the ground */
+.pp-cel-actor {
+  position: absolute;
+  width: 0;
+  height: 0;
+  filter: drop-shadow(0 5px 4px rgba(40, 50, 15, 0.38));
+  will-change: transform;
+}
+.pp-cel-actor img {
+  position: absolute;
+}
+.pp-cel-ground {
+  position: absolute;
+  height: 16px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(40, 50, 15, 0.45), rgba(40, 50, 15, 0));
+}
+
+/* while the celebration stands in for him, the plain snowman is faded out, not removed,
+   so screen readers still read his description */
+.pp-snowman.away {
+  opacity: 0;
+  animation: none;
+}

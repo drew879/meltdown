@@ -19,6 +19,7 @@ import { el } from '../app/dom';
 import { lossHeading, roundSeed, WIN_HEADING } from '../app/copy';
 import { renderHeader } from '../app/header';
 import { art, manifest, snowmanPiece, type Piece } from './art';
+import { createCelebration } from './celebration';
 import { fitAnswer } from './sign-fit';
 import { placeYard } from './yard';
 
@@ -84,6 +85,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
   const thermo = el('div', { class: 'pp-thermo', 'aria-hidden': 'true' }, mercury);
   const snowman = el('img', { class: 'pp-snowman', id: 'snowman', alt: '' });
   const scene = el('section', { class: 'pp-scene', id: 'scene' }, sun, thermo, snowman);
+  const celebration = createCelebration(scene, snowman);
   const answerEl = el('div', { class: 'pp-answer', id: 'answer', role: 'img' });
   const board = el('div', { class: 'pp-board', id: 'board' }, answerEl);
   const category = el('div', { class: 'pp-category', id: 'category' });
@@ -219,9 +221,24 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
 
     // the sun grows and leans in as the heat rises
     const sunSize = Math.min(box.width * 0.3, box.height * 0.42) * (1 + 0.38 * heat);
+    const sunLeft = box.width * (0.03 + 0.04 * heat);
+    const sunTop = box.height * (0.05 + 0.05 * heat);
     sun.style.width = `${sunSize}px`;
-    sun.style.left = `${box.width * (0.03 + 0.04 * heat)}px`;
-    sun.style.top = `${box.height * (0.05 + 0.05 * heat)}px`;
+    sun.style.left = `${sunLeft}px`;
+    sun.style.top = `${sunTop}px`;
+
+    // the win celebration stands in the same place and at the same scale
+    celebration.layout({
+      width: box.width,
+      height: box.height,
+      full,
+      k,
+      baseY,
+      centerX: box.width * 0.48,
+      sunX: sunLeft + sunSize / 2,
+      sunY: sunTop + sunSize / 2,
+      sunSize,
+    });
 
     // the thermometer
     const tw = Math.max(20, Math.min(30, box.height * 0.08));
@@ -243,27 +260,35 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     layoutScene(); // the sign's height feeds the scene's height, so lay out once more
   }
 
-  function showStage(next: number, animate: boolean) {
+  /** Shows the stage, and returns a promise that settles once the snowman has finished moving (at once if he did not move). */
+  function showStage(next: number, animate: boolean): Promise<void> {
     const apply = () => {
       if (destroyed) return;
       shownStage = next;
       snowman.src = art(snowmanPiece(next));
       layoutScene();
     };
-    if (!animate || reduceMotion || shownStage === next) return apply();
+    if (!animate || reduceMotion || shownStage === next) {
+      apply();
+      return Promise.resolve();
+    }
     // a stop-motion pop: squash, swap the piece, spring back
-    snowman
+    return snowman
       .animate([{ transform: 'scale(1.07, 0.9)' }, { transform: 'scale(1.1, 0.86)' }], {
         duration: 170,
         easing: 'steps(2, jump-none)',
       })
       .finished.then(() => {
         apply();
-        snowman.animate(
+        return snowman.animate(
           [{ transform: 'scale(0.93, 1.09)' }, { transform: 'scale(1.04, 0.96)' }, { transform: 'scale(1, 1)' }],
           { duration: 300, easing: 'steps(3, jump-none)' },
-        );
-      });
+        ).finished;
+      })
+      .then(
+        () => undefined,
+        () => undefined, // an animation that was cancelled (the screen was torn down) is simply over
+      );
   }
 
   function describe() {
@@ -353,9 +378,20 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       } else {
         setSun(restingMood());
       }
-      showStage(stage(), !!event);
+      const settled = showStage(stage(), !!event);
       describe();
       layoutScene();
+
+      // a win is celebrated: the backflip, the cloud and the snow. It waits until the snowman has
+      // sprung back to full size. A won round that is simply on screen (a refresh, or reduced
+      // motion) shows how the celebration ends instead.
+      if (outcome() === 'won') {
+        if (event && !reduceMotion) {
+          void settled.then(() => {
+            if (!destroyed && outcome() === 'won') celebration.play();
+          });
+        } else celebration.showRest();
+      } else celebration.reset();
 
       if (phase === 'result') showResult(state, !!event);
       else {
@@ -369,6 +405,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       removeEventListener('keydown', onKeydown);
       clearTimeout(moodTimer);
       clearTimeout(resultTimer);
+      celebration.destroy();
     },
   };
 

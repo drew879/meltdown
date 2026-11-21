@@ -97,6 +97,8 @@ async function guessAll(p, letters) {
 }
 
 const snowmanSrc = (page) => page.evaluate(() => document.getElementById('snowman').getAttribute('src'));
+const celebrationPose = (page) => page.evaluate(() => document.querySelector('.pp-cel-actor img:not([hidden])')?.getAttribute('src') ?? '');
+const flakesInTheAir = (page) => page.locator('.pp-cel-flake:not([hidden])').count();
 const tags = (page) => page.evaluate(() => [...document.querySelectorAll('.pp-tags .pp-tag')].map((t) => t.innerText.replace(/\s+/g, ' ').trim()));
 
 // ---------------------------------------------------------------------------
@@ -179,10 +181,24 @@ for (const [w, h] of SIZES) {
     say((await tags(page))[1].startsWith('SAM 1'), `Sam should have a point, got ${JSON.stringify(await tags(page))}`);
     await p.shot('5-result-win');
     await fits(p, 'result', { playScreen: true });
-    // a refresh on the result keeps the result
+    // the win is celebrated: a backflip, then the cloud and snow, ending at rest
+    say(await page.locator('.pp-cel').isVisible(), 'a win should be celebrated');
+    say(/win-backflip-[1-4]\.webp$/.test(await celebrationPose(page)), `a win should show a backflip pose, got ${await celebrationPose(page)}`);
+    say((await page.locator('#snowman.away').count()) === 1, 'the plain snowman should step aside while the celebration plays');
+    await page.waitForFunction(() => /win-backflip-4/.test(document.querySelector('.pp-cel-actor img:not([hidden])')?.getAttribute('src') ?? ''), null, { timeout: 8000 });
+    say(await page.locator('.pp-cel-cloud').isVisible(), 'the cloud should roll in over the sun');
+    await p.shot('5b-celebration-snow');
+    await page.waitForFunction(() => document.querySelectorAll('.pp-cel-flake:not([hidden])').length === 0, null, { timeout: 12000 });
+    say(/win-backflip-4\.webp$/.test(await celebrationPose(page)) && (await page.locator('.pp-cel-cloud').isVisible()), 'the celebration should end at rest: arms up, under the cloud');
+    // a refresh on the result keeps the result, and the celebration's end rather than playing again
     await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForTimeout(300);
     say((await page.locator('#result').isVisible()) === true, 'refreshing on the result should keep it');
     say((await page.locator('.pp-headline').textContent()) === 'YOU GOT IT!', 'the result heading should survive a refresh');
+    say(/win-backflip-4\.webp$/.test(await celebrationPose(page)) && (await page.locator('.pp-cel-cloud').isVisible()) && (await flakesInTheAir(page)) === 0, 'a refresh on a won round should show how the celebration ends, not play it again');
+    say(/snowman-0\.webp$/.test(await snowmanSrc(page)), 'the plain snowman should still be the full-size one after a refresh');
+    await p.shot('5c-win-after-refresh');
+    await fits(p, 'won result after refresh', { playScreen: true });
     await page.getByRole('button', { name: 'Next round' }).click();
 
     // roles swap: Sam sets, a hard round that Dad loses
@@ -205,6 +221,8 @@ for (const [w, h] of SIZES) {
     say((await tags(page))[0].startsWith('DAD 0'), 'a loss earns no point');
     await p.shot('7-result-loss');
     await fits(p, 'loss', { playScreen: true });
+    say((await page.locator('.pp-cel').isVisible()) === false, 'a lost round should not be celebrated');
+    say((await page.locator('#snowman.away').count()) === 0, 'a lost round should show the plain snowman');
     await page.getByRole('button', { name: 'Next round' }).click();
 
     // Dad sets again: Normal was his last choice; then a refresh in the middle of his guessing round

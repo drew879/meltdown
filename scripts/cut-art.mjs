@@ -36,11 +36,11 @@ const SHEETS = [
   // there it replaces the stage 3 cut from snowman-3-5.png above. join is 10
   // here: at 12 or more the middle and right puddles run together into one piece.
   { src: 'snowman-3-redraw.png', order: 'x', join: 10, names: [null, 'snowman-3', null], hat: true },
-  // Two win celebrations for Drew to choose from, four poses each, read
-  // top left, top right, bottom left, bottom right.
+  // The win celebration: four backflip poses, read top left, top right,
+  // bottom left, bottom right. Drew chose the backflip over the dance on
+  // 2026-11-21; win-dance.png stays in art/layers/originals/ but is not cut.
   { src: 'win-backflip.png', order: 'grid', join: 14, names: ['win-backflip-1', 'win-backflip-2', 'win-backflip-3', 'win-backflip-4'], hat: true },
-  { src: 'win-dance.png', order: 'grid', join: 14, names: ['win-dance-1', 'win-dance-2', 'win-dance-3', 'win-dance-4'], hat: true },
-  // Optional: a cloud to roll over the sun, then six snowflakes.
+  // A cloud to roll over the sun, then six snowflakes, for the win.
   { src: 'win-sky.png', order: 'grid', join: 10, names: ['cloud', 'flake-1', 'flake-2', 'flake-3', 'flake-4', 'flake-5', 'flake-6'], maxSide: 900 },
   { src: 'sun.png', order: 'grid', join: 20, names: ['sun-smug', 'sun-gleeful', 'sun-annoyed', 'sun-dismayed'], maxSide: 460 },
   { src: 'signs.png', order: 'y', join: 12, names: ['sign-1', 'sign-2', 'sign-3'], maxSide: 960, unnail: true },
@@ -69,14 +69,13 @@ const HAT_WIDTH = 190;
  * shorter than stage 4's 729. At 1.096 the hat's area is within 1% of stage 2's
  * and the figure steps evenly between stages 2 and 4: 780, 755, 729 tall and
  * 499, 487, 476 across the snow. This is the right size, not a fudge.
- * Win poses: the same effect left them 6 to 19 percent small (by hat area)
- * beside the fresh snowman, so each sheet is scaled up to match stage 0's hat.
+ * Backflip poses: the same effect left them 6 to 12 percent small (by hat area)
+ * beside the fresh snowman, so the sheet is scaled up to match stage 0's hat.
  */
 const TWEAK = {
   'snowman-3': 1.096,
   'snowman-6': 0.9,
   ...Object.fromEntries([1, 2, 3, 4].map((n) => [`win-backflip-${n}`, 1.1])),
-  ...Object.fromEntries([1, 2, 3, 4].map((n) => [`win-dance-${n}`, 1.19])),
 };
 /** The three sign boards came out in slightly different browns; these bring them to one tone. */
 const TONE = { 'sign-2': { brightness: 0.86, saturation: 0.9 }, 'sign-3': { brightness: 0.94 } };
