@@ -14,7 +14,8 @@
 // it ends, a tap to skip it, a refresh on a lost round, and a phone that asks
 // for reduced motion. Once, at one size: the melt's pieces left out of the
 // first load and fetched with the play screen, the New game confirmation's
-// keys while the melt plays, a resize during it, and a new game cutting it off.
+// keys while the melt plays, a resize during it, and a new game cutting it off;
+// and a result that comes up behind the confirmation taking the focus when it closes.
 // Made-up names only: Sam and Dad.
 import { webkit } from '@playwright/test';
 
@@ -124,6 +125,28 @@ const melt = (page) =>
       bits: box.hidden ? 0 : shown('.pp-melt-bits img').length,
     };
   });
+/** While the flare shows, frame by frame: how far its middle is from the sun's (px), and how far the sun itself moved. */
+const flareOnSun = (page) =>
+  page.evaluate(async () => {
+    const mid = (el) => {
+      const b = el.getBoundingClientRect();
+      return [b.x + b.width / 2, b.y + b.height / 2];
+    };
+    const off = [];
+    const suns = [];
+    for (let i = 0; i < 40; i++) {
+      await new Promise(requestAnimationFrame);
+      const flare = document.querySelector('.pp-melt-flare');
+      if (flare.hidden) continue;
+      const [fx, fy] = mid(flare);
+      const [sx, sy] = mid(document.querySelector('.pp-sun'));
+      off.push(Math.hypot(fx - sx, fy - sy));
+      suns.push([sx, sy]);
+    }
+    const moved = suns.length ? Math.hypot(suns.at(-1)[0] - suns[0][0], suns.at(-1)[1] - suns[0][1]) : 0;
+    return { frames: off.length, worst: Math.max(0, ...off), moved };
+  });
+const focusOn = (page) => page.evaluate(() => document.activeElement?.className || document.activeElement?.tagName);
 const resultShown = (page) => page.locator('#result').isVisible();
 const tags = (page) => page.evaluate(() => [...document.querySelectorAll('.pp-tags .pp-tag')].map((t) => t.innerText.replace(/\s+/g, ' ').trim()));
 
@@ -203,6 +226,9 @@ for (const [w, h] of SIZES) {
     say(/^snowman-[01]$/.test(beat.body ?? ''), `the beat should start from the stage he was at, got ${beat.body}`);
     say(/snowman-1\.webp$/.test(await snowmanSrc(page)), 'the plain snowman should take the new stage at once, behind the beat');
     say(await page.locator('.pp-key:text-is("X")').isDisabled(), 'a wrong key should be switched off at once, while the beat plays');
+    // the ring of rays stays centred on the sun while the sun steps to its new size and place
+    const ring = await flareOnSun(page);
+    say(ring.frames >= 3 && ring.worst <= 1.5, `the flare should stay centred on the sun as it moves, got ${JSON.stringify(ring)}`);
     await page.waitForTimeout(250);
     say((await melt(page)).bits > 0, 'heat should rise during the beat');
     await p.shot('4a-miss-beat');
@@ -383,6 +409,7 @@ for (const [w, h] of SIZES) {
     await page.mouse.click(yard.x + yard.width / 2, yard.y + yard.height / 3);
     await page.waitForTimeout(250);
     say((await resultShown(page)) === true, 'a tap should skip the melt and bring up the result');
+    say((await focusOn(page)) === 'pp-headline', `after a mouse click skips the melt the loss heading should keep the focus, got ${await focusOn(page)}`);
     say((await page.locator('.pp-slot.missed').count()) === 3 && (await page.locator('#answer').innerText()).replace(/\s/g, '') === 'ICE', 'a skipped melt should show the answer and its missed letters at once');
     const skipped = await melt(page);
     say(skipped.body === 'puddle' && skipped.hat === 'puddle-hat' && skipped.bits === 0, `a skipped melt should jump to the puddle at rest, got ${JSON.stringify(skipped)}`);
@@ -520,6 +547,40 @@ for (const [w, h] of SIZES) {
   await page.waitForTimeout(2500);
   say(/meltdown/i.test(await text(page)), 'New game during the melt should go back to the names screen');
   say((await page.evaluate(() => window.frames_)) === 0, 'the melt should stop drawing when the play screen goes away');
+  await p.context.close();
+}
+
+// ===== a result that comes up behind the New game confirmation (once, at one size) =====
+{
+  const p = await newPhone(393, 852, 'result behind the confirmation');
+  const { page, say } = p;
+  await enterNames(p, 'Dad', 'Sam');
+  await setSecret(p, { answer: 'Cat', category: 'Animal', difficulty: 'Hard' });
+  await page.getByRole('button', { name: "It's me" }).click();
+  // a loss: the confirmation is opened while the melt plays, and the melt ends behind it
+  for (const ch of ['X', 'Q', 'Z']) await tap(p, ch);
+  await tap(p, 'W');
+  await page.locator('.pp-menu').click();
+  await page.locator('#result').waitFor({ state: 'visible', timeout: 6000 });
+  say((await page.locator('.pp-dialog').count()) === 1, 'the confirmation should stay open when the melt ends behind it');
+  say(await page.evaluate(() => !!document.activeElement?.closest('.pp-dialog')), 'focus should stay in the confirmation while it is open');
+  await page.getByRole('button', { name: 'Keep playing' }).click();
+  say((await focusOn(page)) === 'pp-headline', `after Keep playing, the loss heading that came up behind the confirmation should take the focus, got ${await focusOn(page)}`);
+  // opened and closed again with nothing new behind it: focus goes back to the New game button, as ever
+  await page.locator('.pp-menu').click();
+  await page.keyboard.press('Escape');
+  say((await focusOn(page)) === 'pp-menu', `with no new result behind it, closing the confirmation should give focus back to New game, got ${await focusOn(page)}`);
+  await page.getByRole('button', { name: 'Next round' }).click();
+  // a win: the result comes up a second after the last letter, behind the confirmation
+  await setSecret(p, { answer: 'Ox', category: 'Animal' });
+  await page.getByRole('button', { name: "It's me" }).click();
+  await tap(p, 'O');
+  await tap(p, 'X');
+  await page.locator('.pp-menu').click();
+  await page.locator('#result').waitFor({ state: 'visible', timeout: 4000 });
+  await page.keyboard.press('Escape');
+  say((await page.locator('.pp-dialog').count()) === 0, 'Escape should close the confirmation over a won result');
+  say((await focusOn(page)) === 'pp-headline', `after the confirmation closes, the win heading that came up behind it should take the focus, got ${await focusOn(page)}`);
   await p.context.close();
 }
 

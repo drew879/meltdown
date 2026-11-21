@@ -135,7 +135,7 @@ export function createMelt(scene: HTMLElement, snowman: HTMLImageElement, sun: H
     last = f;
     if (!m) return;
     const key = JSON.stringify(f);
-    if (key === drawn) return;
+    if (key === drawn) return placeFlare(f); // nothing new to draw, but the sun under the flare may have moved
     drawn = key;
     const k = m.k;
 
@@ -156,16 +156,26 @@ export function createMelt(scene: HTMLElement, snowman: HTMLImageElement, sun: H
 
     // the sun swells, with the ring of rays behind it
     sun.style.scale = f.sunScale === 1 ? '' : String(f.sunScale);
-    flare.hidden = !f.flare;
-    if (f.flare) {
-      const size = m.sunSize * f.sunScale * f.flare.scale;
-      flare.style.width = `${size}px`;
-      flare.style.height = `${size}px`;
-      flare.style.transform = `translate(${m.sunX - size / 2}px, ${m.sunY - size / 2}px) rotate(${f.flare.rot}deg)`;
-    }
+    placeFlare(f);
 
     bits(pools.behind, behind, f.particles.filter((p) => p.behind), k);
     bits(pools.front, front, f.particles.filter((p) => !p.behind), k);
+  }
+  /**
+   * The ring of rays sits centred behind the sun as the sun is right now. A miss also turns the heat
+   * up, and the sun takes half a second to step to its new size and place (paper.css), so the place
+   * the play screen laid out is where it is going, not where it is. Called every frame the flare shows.
+   */
+  function placeFlare(f: MeltFrame) {
+    flare.hidden = !f.flare;
+    if (!f.flare) return;
+    // the sun's own box in the scene, before its pulse and swell, which both turn about its middle
+    const size = sun.offsetWidth * f.sunScale * f.flare.scale;
+    const x = sun.offsetLeft + sun.offsetWidth / 2;
+    const y = sun.offsetTop + sun.offsetHeight / 2;
+    flare.style.width = `${size}px`;
+    flare.style.height = `${size}px`;
+    flare.style.transform = `translate(${x - size / 2}px, ${y - size / 2}px) rotate(${f.flare.rot}deg)`;
   }
   function bits(pool: HTMLImageElement[], layer: HTMLElement, list: Particle[], k: number) {
     while (pool.length < list.length) {

@@ -33,6 +33,11 @@ describe('steps', () => {
     expect(steps(400, 100, 500, 4)).toBe(1);
     expect(steps(900, 100, 500, 4)).toBe(1);
   });
+  it('with a single step holds 0 and jumps to 1 at the end, never dividing by nothing', () => {
+    expect([100, 101, 300, 499, 500, 501].map((t) => steps(t, 100, 500, 1))).toEqual([0, 0, 0, 0, 1, 1]);
+    expect([100, 300, 500].map((t) => steps(t, 100, 500, 0))).toEqual([0, 0, 1]);
+    for (let t = 0; t <= 600; t += 7) for (const n of [0, 1, 2, 3, 6]) expect(Number.isFinite(steps(t, 100, 500, n))).toBe(true);
+  });
 });
 
 describe('a wrong guess', () => {

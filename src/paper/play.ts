@@ -43,6 +43,12 @@ export interface PlayScreen {
   update(state: GameState, event?: PlayEvent): void;
   /** Lay everything out again, after the screen resized or the fonts arrived. */
   layout(): void;
+  /**
+   * The New game confirmation has closed. If the result came up while it was open, its heading could
+   * not take the focus then (the screen behind a dialog cannot), so it takes it now and screen
+   * readers read the result out. Says whether it did; if not, focus goes back where it was.
+   */
+  afterDialog(): boolean;
   destroy(): void;
 }
 
@@ -127,9 +133,19 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
   // The melt at the end of a lost round can be skipped with a tap anywhere but the name tags, or with
   // Enter, Space or Escape. It listens for the press, not the click, so the tap on the last wrong key
   // (whose click is what starts the melt) can never skip it.
+  // A skip brings the result up and its heading takes the focus. With a mouse, the press would then
+  // move the focus on to the page itself (a tap does not), so the press that skipped does nothing else.
+  let skipPress = false;
   const onSkipPress = (e: PointerEvent) => {
-    if (!header.contains(e.target as Node)) melt.skip();
+    if (header.contains(e.target as Node) || !melt.skip()) return;
+    skipPress = true;
+    e.preventDefault();
   };
+  const onSkipMouse = (e: MouseEvent) => {
+    if (skipPress) e.preventDefault(); // where cancelling the pointer press does not cancel the mouse press that follows it
+    skipPress = false;
+  };
+  const onSkipRelease = () => (skipPress = false);
   const onSkipKey = (e: KeyboardEvent) => {
     // a key on the New game button, or on the confirmation or a notice over the screen, is for that button
     const target = e.target as Node;
@@ -137,6 +153,9 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
     if ((e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') && melt.skip()) e.preventDefault();
   };
   root.addEventListener('pointerdown', onSkipPress);
+  root.addEventListener('mousedown', onSkipMouse);
+  addEventListener('pointerup', onSkipRelease);
+  addEventListener('pointercancel', onSkipRelease);
   addEventListener('keydown', onSkipKey);
 
   // ---- what is on screen ----
@@ -155,6 +174,8 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
    * (Drew, 2026-11-21).
    */
   let holdAnswer = false;
+  /** True when the result came up but its heading could not take the focus, because the New game confirmation was open. */
+  let focusOwed = false;
   let popLetter: string | undefined;
   let destroyed = false;
 
@@ -354,7 +375,10 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       tray.classList.add('away');
       tray.inert = true;
       result.hidden = false;
-      if (live) headline.focus({ preventScroll: true }); // screen readers read the result out
+      if (live) {
+        headline.focus({ preventScroll: true }); // screen readers read the result out
+        focusOwed = document.activeElement !== headline; // the confirmation is open: it takes the focus when that closes
+      }
     };
     clearTimeout(resultTimer);
     const run = ++resultRun;
@@ -400,6 +424,7 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
       // A wrong guess that has just been made melts him, unless motion is reduced.
       const melting = !!event && event.status === 'wrong' && !reduceMotion && stageBefore >= 0;
       holdAnswer = melting && outcome() === 'lost';
+      focusOwed = false;
       drawAnswer();
       popLetter = undefined; // the pop plays once, not again on every resize
 
@@ -456,10 +481,18 @@ export function createPlayScreen(deps: PlayDeps): PlayScreen {
         result.hidden = true;
       }
     },
+    afterDialog() {
+      if (!focusOwed || result.hidden) return false;
+      focusOwed = false;
+      headline.focus({ preventScroll: true });
+      return document.activeElement === headline;
+    },
     destroy() {
       destroyed = true;
       removeEventListener('keydown', onKeydown);
       removeEventListener('keydown', onSkipKey);
+      removeEventListener('pointerup', onSkipRelease);
+      removeEventListener('pointercancel', onSkipRelease);
       clearTimeout(moodTimer);
       clearTimeout(resultTimer);
       celebration.destroy();

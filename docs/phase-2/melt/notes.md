@@ -31,6 +31,8 @@ Rules it follows:
 - **Reduced motion and `?still`:** no beat (the new stage simply shows), and a lost round is the puddle as a still picture, with the result up at once.
 - **A refresh** mid-round shows the stage with no beat; on a lost round it shows the puddle at rest (bobbing and blinking, unless motion is reduced), with no replay.
 - **The hat** jumps across to above where it will land and hangs with its middle at 0.6 of his height, whichever stage it came off. Higher than that and, on Hard on a 320 px phone, it ran into the sun.
+- **The flare follows the sun.** A miss also turns the heat up, and the sun takes half a second to step to its new size and place, so the flare is placed from the sun's own box every frame it shows, not from where the layout says the sun is going.
+- **Focus.** When the result comes up, its heading takes the focus so screen readers read it. A mouse press that skips the melt is cancelled, or it would move the focus on to the page. If the New game confirmation is open when the result comes up (after a melt, or a second after a win), the heading takes the focus when the confirmation closes (`afterDialog` in `play.ts`, called by `app.ts`).
 - **WebKit:** every picture is a direct child of the melt's actor. Pictures nested in a second zero-size box inside the actor's drop shadow were not painted at all in WebKit.
 - The loose pieces are left out of the first-load preload (`src/paper/art.ts`), like the win celebration's.
 

@@ -201,6 +201,8 @@ export function startApp(host: HTMLElement) {
       scrim.remove();
       screenHost.toggleAttribute('inert', false);
       notices.toggleAttribute('inert', false);
+      // a result that came up behind the confirmation is owed the focus; otherwise it goes back where it was
+      if (play?.afterDialog()) return;
       if (opener?.isConnected) opener.focus({ preventScroll: true });
     };
     const onKey = (e: KeyboardEvent) => {

@@ -98,10 +98,11 @@ function held<T>(t: number, keys: readonly (readonly [number, T])[]): T {
   return v;
 }
 
-/** 0 to 1 in held steps between two times, reaching exactly 1 on the last step. */
+/** 0 to 1 in held steps between two times, reaching exactly 1 on the last step. With one step it holds 0, then jumps to 1 at the end. */
 export function steps(t: number, from: number, to: number, n: number): number {
   if (t <= from) return 0;
   if (t >= to) return 1;
+  if (n < 2) return 0;
   return Math.min(1, Math.floor(((t - from) / (to - from)) * n) / (n - 1));
 }
 
