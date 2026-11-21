@@ -4,7 +4,7 @@ import { currentGuesser, currentSetter, scores, type GameState } from '../engine
 import { el } from './dom';
 import { pointsLabel } from './copy';
 
-export function renderHeader(header: HTMLElement, state: GameState, onNewGame: () => void) {
+export function renderHeader(header: HTMLElement, state: GameState, onNewGame: (event: Event) => void) {
   const sc = scores(state);
   const setter = currentSetter(state);
   const guesser = currentGuesser(state);

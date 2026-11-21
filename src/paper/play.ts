@@ -27,7 +27,7 @@ export interface PlayDeps {
   reduceMotion: boolean;
   onGuess(letter: string): void;
   onNext(): void;
-  onNewGame(): void;
+  onNewGame(event?: Event): void;
 }
 
 /** What just happened, when the screen is updating because of a tap and not because it was rebuilt. */

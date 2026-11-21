@@ -32,7 +32,7 @@ export interface ScreenContext {
   yard: HTMLImageElement;
   draft: SetupDraft;
   dispatch(action: Action): Reduction;
-  askNewGame(): void;
+  askNewGame(event?: Event): void;
   /** Take the setup form back to a round that was set but not yet played. */
   changeAnswer(): void;
 }
@@ -66,7 +66,7 @@ function errorLine(): { node: HTMLElement; show(message: string | null): void } 
   };
 }
 
-function button(label: string, onclick: () => void, kind: 'main' | 'alt' = 'main', type: 'button' | 'submit' = 'button') {
+function button(label: string, onclick: (event: Event) => void, kind: 'main' | 'alt' = 'main', type: 'button' | 'submit' = 'button') {
   return el('button', { class: kind === 'main' ? 'pp-btn' : 'pp-btn alt', type, onclick }, label);
 }
 

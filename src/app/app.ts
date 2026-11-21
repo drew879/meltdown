@@ -186,10 +186,13 @@ export function startApp(host: HTMLElement) {
   }
 
   // ---- starting a new game, always behind a confirmation ----
-  function askNewGame() {
+  function askNewGame(event?: Event) {
     if (dialogOpen) return;
     dialogOpen = true;
-    const opener = document.activeElement as HTMLElement | null;
+    // Where focus goes back to. Safari and iOS do not focus a button when it is
+    // tapped, so the focused element can be the page itself: use the button that
+    // was tapped, and only fall back to the focused element (the keyboard case).
+    const opener = (event?.currentTarget as HTMLElement | null) ?? (document.activeElement as HTMLElement | null);
     screenHost.toggleAttribute('inert', true);
     notices.toggleAttribute('inert', true);
     const close = () => {
